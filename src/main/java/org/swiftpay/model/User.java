@@ -1,6 +1,5 @@
 package org.swiftpay.model;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,8 +19,10 @@ public class User {
 
     private String username;
 
+    @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
     private String cpfCnpj;
 
     private String password;

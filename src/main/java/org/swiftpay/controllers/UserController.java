@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.swiftpay.dtos.ReactivateUserDTO;
 import org.swiftpay.dtos.RegisterUserDTO;
 import org.swiftpay.dtos.ViewAllUsersDTO;
 import org.swiftpay.services.UserServices;
@@ -46,10 +47,19 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/delete")
-    protected ResponseEntity <Void> deleteAllUsers () {
+    @PutMapping("/reactivate-account")
+    protected ResponseEntity <Void> reactivateUser (@RequestBody ReactivateUserDTO reactivateUserDTO) {
 
-        userServices.deleteAll();
+        userServices.reactivateUserAccount(reactivateUserDTO);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
+    @DeleteMapping("/delete-account/{id}")
+    protected ResponseEntity <Void> disableUser (@PathVariable Long id) {
+
+        userServices.disableUserAccount(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 

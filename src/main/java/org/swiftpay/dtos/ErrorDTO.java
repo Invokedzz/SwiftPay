@@ -1,3 +1,5 @@
 package org.swiftpay.dtos;
 
-public record ErrorDTO (String message) {}
+import java.time.LocalDateTime;
+
+public record ErrorDTO (Integer httpStatus, String message, LocalDateTime timestamp) {}

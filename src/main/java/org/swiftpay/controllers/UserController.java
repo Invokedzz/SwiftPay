@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    protected ResponseEntity <Void> register (@RequestBody @Valid RegisterUserDTO registerUserDTO) {
+    protected ResponseEntity <Void> register (@Valid @RequestBody RegisterUserDTO registerUserDTO) {
 
         userServices.register(registerUserDTO);
 

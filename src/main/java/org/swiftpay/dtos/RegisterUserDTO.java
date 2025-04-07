@@ -14,7 +14,6 @@ public record RegisterUserDTO (
         @NotBlank(message = "Email field cannot be blank!")
         String email,
 
-        @NotBlank(message = "CPF/CNPJ field cannot be blank!")
         String cpfCnpj,
 
         @NotBlank(message = "Password field cannot be blank!")

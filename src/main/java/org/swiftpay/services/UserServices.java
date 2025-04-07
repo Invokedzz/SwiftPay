@@ -13,6 +13,7 @@ import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
 import org.swiftpay.model.Wallet;
 import org.swiftpay.repositories.DeleteRegisterRepository;
+import org.swiftpay.repositories.RoleRepository;
 import org.swiftpay.repositories.UserRepository;
 
 import java.math.BigDecimal;
@@ -32,10 +33,13 @@ public class UserServices {
 
     private final DeleteRegisterRepository deleteRegisterRepository;
 
+    private final RoleRepository roleRepository;
+
     public UserServices (UserRepository userRepository,
                          CPFValidator cpfValidator,
                          PasswordEncoder passwordEncoder,
-                         DeleteRegisterRepository deleteRegisterRepository) {
+                         DeleteRegisterRepository deleteRegisterRepository,
+                         RoleRepository roleRepository) {
 
         this.userRepository = userRepository;
 
@@ -45,11 +49,14 @@ public class UserServices {
 
         this.deleteRegisterRepository = deleteRegisterRepository;
 
+        this.roleRepository = roleRepository;
+
     }
 
+    @Transactional
     public void register (RegisterUserDTO registerUserDTO) {
 
-        validateUserPropertiesBeforeRegister(registerUserDTO);
+        validateUserPropertiesBeforeRegisterThenSave(registerUserDTO);
 
     }
 
@@ -64,7 +71,8 @@ public class UserServices {
     @Transactional
     public void reactivateUserAccount (ReactivateUserDTO reactivateUserDTO) {
 
-        var searchForAccount = userRepository.findByEmail(reactivateUserDTO.email()).orElse(null);
+        var searchForAccount = userRepository.findByEmail(reactivateUserDTO.email())
+                                             .orElse(null);
 
         if (searchForAccount != null) {
 
@@ -114,7 +122,7 @@ public class UserServices {
 
         for (DeleteRegister deleteRegister : allDeleteRegisters) {
 
-            if (checkDaysBeforeAccountDeletion(deleteRegister.getDeleteDate()) > 10) {
+            if (checkDaysBeforeAccountDeletion(deleteRegister.getDeleteDate()) > 1) {
 
                 deleteRegisterRepository.delete(deleteRegister);
 
@@ -142,7 +150,7 @@ public class UserServices {
 
     }
 
-    private void validateUserPropertiesBeforeRegister (RegisterUserDTO registerUserDTO) {
+    private void validateUserPropertiesBeforeRegisterThenSave (RegisterUserDTO registerUserDTO) {
 
         User user = new User(registerUserDTO);
 
@@ -164,7 +172,15 @@ public class UserServices {
 
             userRepository.save(user);
 
+            setupUserRolesAndSave(user);
+
         }
+
+    }
+
+    private void setupUserRolesAndSave (User user) {
+
+        roleRepository.findById(1L).ifPresent(searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId()));
 
     }
 

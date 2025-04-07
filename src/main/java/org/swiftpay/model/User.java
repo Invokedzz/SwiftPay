@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.swiftpay.dtos.RegisterUserDTO;
 
+import java.util.List;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -31,6 +33,11 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Wallet wallet;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns =
+    @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List <Role> roles;
 
     public User (RegisterUserDTO registerUserDTO) {
 

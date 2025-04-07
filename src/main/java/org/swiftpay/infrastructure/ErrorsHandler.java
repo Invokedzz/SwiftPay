@@ -1,32 +1,82 @@
 package org.swiftpay.infrastructure;
 
 import br.com.caelum.stella.validation.InvalidStateException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.swiftpay.dtos.ErrorDTO;
 import org.swiftpay.exceptions.UserNotFoundException;
 
+import java.time.LocalDateTime;
+
 @RestControllerAdvice
 public class ErrorsHandler {
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
-    public ErrorDTO handleNotFoundException (UserNotFoundException ex) {
+    public ResponseEntity <ErrorDTO> handleUserNotFoundException(UserNotFoundException ex) {
 
-        return new ErrorDTO(ex.getMessage());
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidStateException.class)
-    public ErrorDTO handleInvalidCPFException (InvalidStateException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity <ErrorDTO> handleMethodArgumentNotValidException (MethodArgumentNotValidException ex) {
 
-        return new ErrorDTO(ex.getMessage());
+        FieldError fieldError = ex.getBindingResult().getFieldError();
+
+        assert fieldError != null;
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.BAD_REQUEST.value(),
+                fieldError.getDefaultMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler({InvalidStateException.class, BadRequestException.class})
+    public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler({RuntimeException.class, Exception.class})
+    public ResponseEntity <ErrorDTO> handleExceptions(Exception ex) {
+
+        ErrorDTO errorMessage = new ErrorDTO(
+
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 

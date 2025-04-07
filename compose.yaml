@@ -1,0 +1,13 @@
+services:
+  ollama:
+    image: 'ollama/ollama:latest'
+    ports:
+      - '11434'
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=SwiftPay'
+      - 'POSTGRES_PASSWORD=s38c1973'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5432'

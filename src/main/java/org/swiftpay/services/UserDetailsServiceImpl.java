@@ -1,6 +1,5 @@
 package org.swiftpay.services;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,13 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         var user = userRepository.findByUsername(username);
 
-        if (user == null) {
+        if (user != null) {
 
-            throw new UsernameNotFoundException("We weren't able to find a user with username: " + username);
+            return user;
 
         }
 
-        return user;
+        throw new UsernameNotFoundException("We weren't able to find a user with username: " + username);
 
     }
 

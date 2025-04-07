@@ -75,4 +75,46 @@ class UserControllerTest {
 
     }
 
+    @Test
+    void login_ThenReturnOK_AndGenerateToken () throws Exception {
+
+
+
+    }
+
+    @Test
+    void login_ThenReturnNotFound () throws Exception {
+
+
+
+    }
+
+    @Test
+    void reactivateAccount_ThenReturnNoContent () throws Exception {
+
+
+
+    }
+
+    @Test
+    void reactivateAccount_ThenReturnNotFound () throws Exception {
+
+
+
+    }
+
+    @Test
+    void deleteAccount_ThenReturnNoContent () throws Exception {
+
+
+
+    }
+
+    @Test
+    void deleteAccount_ThenReturnNotFound () throws Exception {
+
+
+
+    }
+
 }

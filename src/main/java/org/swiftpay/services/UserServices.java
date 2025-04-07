@@ -3,10 +3,14 @@ package org.swiftpay.services;
 import br.com.caelum.stella.validation.CPFValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.swiftpay.dtos.LoginDTO;
 import org.swiftpay.dtos.ReactivateUserDTO;
-import org.swiftpay.dtos.RegisterUserDTO;
+import org.swiftpay.dtos.RegisterDTO;
 import org.swiftpay.dtos.ViewAllUsersDTO;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.DeleteRegister;
@@ -35,11 +39,17 @@ public class UserServices {
 
     private final RoleRepository roleRepository;
 
+    private final AuthenticationManager authenticationManager;
+
+    private final TokenAuthService tokenAuthService;
+
     public UserServices (UserRepository userRepository,
                          CPFValidator cpfValidator,
                          PasswordEncoder passwordEncoder,
                          DeleteRegisterRepository deleteRegisterRepository,
-                         RoleRepository roleRepository) {
+                         RoleRepository roleRepository,
+                         AuthenticationManager authenticationManager,
+                         TokenAuthService tokenAuthService) {
 
         this.userRepository = userRepository;
 
@@ -51,12 +61,26 @@ public class UserServices {
 
         this.roleRepository = roleRepository;
 
+        this.authenticationManager = authenticationManager;
+
+        this.tokenAuthService = tokenAuthService;
+
     }
 
     @Transactional
-    public void register (RegisterUserDTO registerUserDTO) {
+    public void register (RegisterDTO registerUserDTO) {
 
         validateUserPropertiesBeforeRegisterThenSave(registerUserDTO);
+
+    }
+
+    public String login (LoginDTO loginDTO) {
+
+        var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
+
+        var authentication = authenticationManager.authenticate(searchForUser);
+
+        return tokenAuthService.generateToken((User) authentication.getPrincipal());
 
     }
 
@@ -150,7 +174,7 @@ public class UserServices {
 
     }
 
-    private void validateUserPropertiesBeforeRegisterThenSave (RegisterUserDTO registerUserDTO) {
+    private void validateUserPropertiesBeforeRegisterThenSave (RegisterDTO registerUserDTO) {
 
         User user = new User(registerUserDTO);
 

@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.swiftpay.dtos.ErrorDTO;
 import org.swiftpay.exceptions.UserNotFoundException;
+import org.swiftpay.exceptions.UsernameNotFoundException;
 
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class ErrorsHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler({UserNotFoundException.class, UsernameNotFoundException.class})
     public ResponseEntity <ErrorDTO> handleUserNotFoundException(UserNotFoundException ex) {
 
         ErrorDTO response = new ErrorDTO(

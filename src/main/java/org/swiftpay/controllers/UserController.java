@@ -4,9 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swiftpay.dtos.ReactivateUserDTO;
-import org.swiftpay.dtos.RegisterUserDTO;
-import org.swiftpay.dtos.ViewAllUsersDTO;
+import org.swiftpay.dtos.*;
 import org.swiftpay.services.UserServices;
 
 import java.util.Set;
@@ -23,7 +21,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    protected ResponseEntity <Void> register (@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+    protected ResponseEntity <Void> register (@Valid @RequestBody RegisterDTO registerUserDTO) {
 
         userServices.register(registerUserDTO);
 
@@ -32,9 +30,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    protected ResponseEntity <Void> login () {
+    protected ResponseEntity <UserTokenDTO> login (@Valid @RequestBody LoginDTO loginDTO) {
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var generatedToken = userServices.login(loginDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new UserTokenDTO(generatedToken));
 
     }
 

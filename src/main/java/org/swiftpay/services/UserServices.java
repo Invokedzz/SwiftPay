@@ -113,7 +113,7 @@ public class UserServices {
     public void reactivateUserAccount (ReactivateUserDTO reactivateUserDTO) {
 
         var searchForAccount = userRepository.findByEmail(reactivateUserDTO.email())
-                                             .orElse(null);
+                                            .orElse(null);
 
         if (searchForAccount != null) {
 

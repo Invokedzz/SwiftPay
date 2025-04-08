@@ -7,12 +7,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.swiftpay.dtos.LoginDTO;
 import org.swiftpay.dtos.ReactivateUserDTO;
 import org.swiftpay.dtos.RegisterDTO;
@@ -40,39 +38,58 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void register_ThenReturnCREATED () throws Exception {
+    void registerClient_ThenReturnCREATED () throws Exception {
 
-        RegisterDTO registerUserDTO = new RegisterDTO("Athena", "athena@gmail.com",
+        RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
                                         "76323556855", "123456");
 
         var mockUserServices = Mockito.mock(UserServices.class);
 
-        mockUserServices.registerAsClient(registerUserDTO);
+        mockUserServices.registerAsClient(registerDTO);
 
-        mockMvc.perform(post("/register")
-                .contentType("application/json").content(new ObjectMapper().writeValueAsString(registerUserDTO)))
+        mockMvc.perform(post("/register/client")
+                .contentType("application/json").content(new ObjectMapper().writeValueAsString(registerDTO)))
                 .andExpect(status().isCreated());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerUserDTO);
+        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerDTO);
 
     }
 
     @Test
-    void register_ThenThrowInvalidArgumentException_BecauseNameLengthIsInvalid () throws Exception {
+    void registerClient_ThenThrowInvalidArgumentException_BecauseNameLengthIsInvalid () throws Exception {
 
-        RegisterDTO registerUserDTO = new RegisterDTO("", "athena@gmail.com",
+        RegisterDTO registerDTO = new RegisterDTO("", "athena@gmail.com",
                 "76323556855", "123456");
 
         var mockUserServices = Mockito.mock(UserServices.class);
 
-        mockUserServices.registerAsClient(registerUserDTO);
+        mockUserServices.registerAsClient(registerDTO);
 
-        mockMvc.perform(post("/register")
+        mockMvc.perform(post("/register/client")
                         .contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(registerUserDTO)))
+                        .content(new ObjectMapper().writeValueAsString(registerDTO)))
                         .andExpect(status().isBadRequest());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerUserDTO);
+        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerDTO);
+
+    }
+
+    @Test
+    void registerSeller_ThenReturnCREATED () throws Exception {
+
+        RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
+                "76323556855", "123456");
+
+        var mockUserServices = Mockito.mock(UserServices.class);
+
+        mockUserServices.registerAsSeller(registerDTO);
+
+        mockMvc.perform(post("/register/seller")
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(registerDTO)))
+                        .andExpect(status().isBadRequest());
+
+        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsSeller(registerDTO);
 
     }
 
@@ -111,13 +128,6 @@ class UserControllerTest {
     }
 
     @Test
-    void reactivateAccount_ThenReturnNotFound () throws Exception {
-
-        
-
-    }
-
-    @Test
     void deleteAccount_ThenReturnNoContent () throws Exception {
 
         var mockUserServices = Mockito.mock(UserServices.class);
@@ -132,11 +142,5 @@ class UserControllerTest {
 
     }
 
-    @Test
-    void deleteAccount_ThenReturnNotFound () throws Exception {
-
-
-
-    }
 
 }

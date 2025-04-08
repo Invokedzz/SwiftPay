@@ -1,5 +1,6 @@
 package org.swiftpay.services;
 
+import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,9 +29,20 @@ import java.util.stream.Collectors;
 @Service
 public class UserServices {
 
+    /*
+
+        Adjusts I need to make:
+
+        validate the user id in the "disableUserAccount" method, then create permissions using Spring Security
+        After that, I need to set up the email sender for functions like "reactivate and disable"
+
+    */
+
     private final UserRepository userRepository;
 
     private final CPFValidator cpfValidator;
+
+    private final CNPJValidator cnpjValidator;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -44,6 +56,7 @@ public class UserServices {
 
     public UserServices (UserRepository userRepository,
                          CPFValidator cpfValidator,
+                         CNPJValidator cnpjValidator,
                          PasswordEncoder passwordEncoder,
                          DeleteRegisterRepository deleteRegisterRepository,
                          RoleRepository roleRepository,
@@ -53,6 +66,8 @@ public class UserServices {
         this.userRepository = userRepository;
 
         this.cpfValidator = cpfValidator;
+
+        this.cnpjValidator = cnpjValidator;
 
         this.passwordEncoder = passwordEncoder;
 
@@ -67,19 +82,22 @@ public class UserServices {
     }
 
     @Transactional
-    public void register (RegisterDTO registerUserDTO) {
+    public void registerAsClient (RegisterDTO registerDTO) {
 
-        validateUserPropertiesBeforeRegisterThenSave(registerUserDTO);
+        validateClientPropertiesBeforeRegisterThenSave(registerDTO);
+
+    }
+
+    @Transactional
+    public void registerAsSeller (RegisterDTO registerDTO) {
+
+        validateSellerPropertiesBeforeRegisterThenSave(registerDTO);
 
     }
 
     public String login (LoginDTO loginDTO) {
 
-        var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
-
-        var authentication = authenticationManager.authenticate(searchForUser);
-
-        return tokenAuthService.generateToken((User) authentication.getPrincipal());
+        return validateLoginPropertiesThenGenerateToken(loginDTO);
 
     }
 
@@ -145,7 +163,7 @@ public class UserServices {
 
         for (DeleteRegister deleteRegister : allDeleteRegisters) {
 
-            if (checkDaysBeforeAccountDeletion(deleteRegister.getDeleteDate()) > 1) {
+            if (checkDaysBeforeAccountDeletion(deleteRegister.getDeleteDate()) > 0) {
 
                 deleteRegisterRepository.delete(deleteRegister);
 
@@ -173,9 +191,19 @@ public class UserServices {
 
     }
 
-    private void validateUserPropertiesBeforeRegisterThenSave (RegisterDTO registerUserDTO) {
+    private String validateLoginPropertiesThenGenerateToken (LoginDTO loginDTO) {
 
-        User user = new User(registerUserDTO);
+        var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
+
+        var authentication = authenticationManager.authenticate(searchForUser);
+
+        return tokenAuthService.generateToken((User) authentication.getPrincipal());
+
+    }
+
+    private void validateClientPropertiesBeforeRegisterThenSave (RegisterDTO registerDTO) {
+
+        User user = new User(registerDTO);
 
         Wallet wallet = new Wallet();
 
@@ -201,9 +229,55 @@ public class UserServices {
 
     }
 
+    private void validateSellerPropertiesBeforeRegisterThenSave (RegisterDTO registerDTO) {
+
+        User user = new User(registerDTO);
+
+        Wallet wallet = new Wallet();
+
+        cnpjValidator.assertValid(user.getCpfCnpj());
+
+        if (cnpjValidator.isEligible(user.getCpfCnpj())) {
+
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+
+            user.setPassword(encodedPassword);
+
+            wallet.setBalance(BigDecimal.valueOf(0.0));
+
+            wallet.setUser(user);
+
+            user.setWallet(wallet);
+
+            userRepository.save(user);
+
+            setupUserRolesAndSave(user);
+
+        }
+
+    }
+
     private void setupUserRolesAndSave (User user) {
 
-        roleRepository.findById(1L).ifPresent(searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId()));
+        if (cpfValidator.isEligible(user.getCpfCnpj())) {
+
+            roleRepository.findById(1L).ifPresent(
+
+                    searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
+
+            );
+
+        }
+
+        else if (cnpjValidator.isEligible(user.getCpfCnpj())) {
+
+            roleRepository.findById(2L).ifPresent(
+
+                    searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
+
+            );
+
+        }
 
     }
 

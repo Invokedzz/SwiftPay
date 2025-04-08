@@ -20,10 +20,19 @@ public class UserController {
 
     }
 
-    @PostMapping("/register")
-    protected ResponseEntity <Void> register (@Valid @RequestBody RegisterDTO registerUserDTO) {
+    @PostMapping("/register/client")
+    protected ResponseEntity <Void> clientRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
-        userServices.register(registerUserDTO);
+        userServices.registerAsClient(registerDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    }
+
+    @PostMapping("/register/seller")
+    protected ResponseEntity <Void> sellerRegister (@Valid @RequestBody RegisterDTO registerDTO) {
+
+        userServices.registerAsSeller(registerDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
 

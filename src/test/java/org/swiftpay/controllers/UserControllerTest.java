@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -77,7 +78,7 @@ class UserControllerTest {
     @Test
     void registerSeller_ThenReturnCREATED () throws Exception {
 
-        RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
+        RegisterDTO registerDTO = new RegisterDTO("", "athena@gmail.com",
                 "76323556855", "123456");
 
         var mockUserServices = Mockito.mock(UserServices.class);
@@ -132,13 +133,13 @@ class UserControllerTest {
 
         var mockUserServices = Mockito.mock(UserServices.class);
 
-        mockUserServices.disableUserAccount(1L);
+        mockUserServices.disableUserAccount(HttpHeaders.EMPTY,1L);
 
         mockMvc.perform(delete("/delete-account/{id}", 1L)
                         .contentType("application/json"))
                         .andExpect(status().isNoContent());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).disableUserAccount(1L);
+        Mockito.verify(mockUserServices, Mockito.times(1)).disableUserAccount(HttpHeaders.EMPTY,1L);
 
     }
 

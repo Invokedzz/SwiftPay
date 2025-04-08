@@ -3,12 +3,13 @@ package org.swiftpay.services;
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -132,6 +133,24 @@ class UserServicesTest {
         Mockito.verify(userRepository, Mockito.times(1)).save(user);
 
         Mockito.verify(roleRepository, Mockito.times(1)).insertRole(Mockito.anyLong(), Mockito.anyLong());
+
+    }
+
+    @Test
+    void login_ThenGenerateToken () {
+
+        var mockAuthentication = Mockito.mock(Authentication.class);
+
+        Mockito.when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(mockAuthentication);
+
+        String mockJwtToken = "mocked-jwt-token";
+
+        Mockito.when(tokenAuthService.generateToken(new User())).thenReturn(mockJwtToken);
+
+        tokenAuthService.generateToken(new User());
+
+        Mockito.verify(tokenAuthService, Mockito.times(1)).generateToken(new User());
 
     }
 

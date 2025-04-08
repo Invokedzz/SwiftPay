@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.swiftpay.dtos.ErrorDTO;
+import org.swiftpay.exceptions.ForbiddenAccessException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.exceptions.UsernameNotFoundException;
 
@@ -78,6 +79,21 @@ public class ErrorsHandler {
         );
 
         return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
+    @ExceptionHandler(ForbiddenAccessException.class)
+    public ResponseEntity <ErrorDTO> handleForbiddenAccessException(ForbiddenAccessException ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
 
     }
 

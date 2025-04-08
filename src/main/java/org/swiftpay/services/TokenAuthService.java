@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.swiftpay.exceptions.InvalidTokenException;
@@ -13,6 +14,7 @@ import org.swiftpay.model.User;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TokenAuthService {
@@ -48,6 +50,8 @@ public class TokenAuthService {
 
     }
 
+
+
     public String verifyToken (String token) {
 
         try {
@@ -65,6 +69,16 @@ public class TokenAuthService {
             throw new InvalidTokenException(ex.getMessage());
 
         }
+
+    }
+
+    public Long findSessionId (HttpHeaders headers) {
+
+        String token = Objects.requireNonNull(headers.get("Authorization")).getFirst();
+
+        String jwt = token.replace("Bearer ", "");
+
+        return JWT.decode(jwt).getClaim("User Id").asLong();
 
     }
 

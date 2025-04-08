@@ -3,6 +3,7 @@ package org.swiftpay.services;
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +13,7 @@ import org.swiftpay.dtos.LoginDTO;
 import org.swiftpay.dtos.ReactivateUserDTO;
 import org.swiftpay.dtos.RegisterDTO;
 import org.swiftpay.dtos.ViewAllUsersDTO;
+import org.swiftpay.exceptions.ForbiddenAccessException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
@@ -132,12 +134,14 @@ public class UserServices {
     }
 
     @Transactional
-    public void disableUserAccount (Long id) {
+    public void disableUserAccount (HttpHeaders headers, Long id) {
 
         var searchForAccount = userRepository.findById(id)
                                              .orElse(null);
 
         if (searchForAccount != null) {
+
+            compareIdFromTheSessionWithTheIdInTheUrl(headers, searchForAccount.getId());
 
             searchForAccount.deactivate();
 
@@ -276,6 +280,18 @@ public class UserServices {
                     searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
 
             );
+
+        }
+
+    }
+
+    private void compareIdFromTheSessionWithTheIdInTheUrl (HttpHeaders headers, Long sentId) {
+
+        Long sessionId = tokenAuthService.findSessionId(headers);
+
+        if (!sessionId.equals(sentId)) {
+
+            throw new ForbiddenAccessException("You are not allowed to access this session");
 
         }
 

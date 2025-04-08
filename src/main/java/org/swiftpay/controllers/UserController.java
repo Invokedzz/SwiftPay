@@ -1,6 +1,7 @@
 package org.swiftpay.controllers;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,9 +67,9 @@ public class UserController {
     }
 
     @DeleteMapping("/delete-account/{id}")
-    protected ResponseEntity <Void> disableUser (@PathVariable Long id) {
+    protected ResponseEntity <Void> disableUser (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
 
-        userServices.disableUserAccount(id);
+        userServices.disableUserAccount(headers, id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 

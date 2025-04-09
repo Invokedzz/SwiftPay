@@ -149,11 +149,11 @@ class UserServicesTest {
 
         String mockJwtToken = "mocked-jwt-token";
 
-        Mockito.when(tokenAuthService.generateToken(new User())).thenReturn(mockJwtToken);
+        Mockito.when(tokenAuthService.generateLoginToken(new User())).thenReturn(mockJwtToken);
 
-        tokenAuthService.generateToken(new User());
+        tokenAuthService.generateLoginToken(new User());
 
-        Mockito.verify(tokenAuthService, Mockito.times(1)).generateToken(new User());
+        Mockito.verify(tokenAuthService, Mockito.times(1)).generateLoginToken(new User());
 
     }
 

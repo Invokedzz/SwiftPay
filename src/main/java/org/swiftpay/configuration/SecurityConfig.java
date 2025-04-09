@@ -31,7 +31,7 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(custom -> custom.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login").permitAll())
+                .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account").permitAll())
                 .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/reactivate-account", "/all").hasRole("CLIENT"))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 

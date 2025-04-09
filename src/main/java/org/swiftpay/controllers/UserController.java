@@ -39,6 +39,15 @@ public class UserController {
 
     }
 
+    @PostMapping("/activate-account")
+    protected ResponseEntity <Void> activateAccount (@RequestHeader String token) {
+
+        userServices.activateUserAccount(token);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+
+    }
+
     @PostMapping("/login")
     protected ResponseEntity <UserTokenDTO> login (@Valid @RequestBody LoginDTO loginDTO) {
 

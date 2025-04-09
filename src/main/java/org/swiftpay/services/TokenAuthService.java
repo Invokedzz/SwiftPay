@@ -22,7 +22,27 @@ public class TokenAuthService {
     @Value("spring.security.oauth2.client.registration")
     private String secret;
 
-    public String generateToken (User user) {
+    public String generatePreAccountConfirmationToken (User user) {
+
+        try {
+
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+
+            return JWT.create()
+                    .withClaim("User Id", user.getId())
+                    .withClaim("Is Active", user.getActive())
+                    .withIssuer("SwiftPayments").withExpiresAt(tokenExpirationInstantForPendingAccounts())
+                    .sign(algorithm);
+
+        } catch (JWTCreationException ex) {
+
+            throw new TokenCreationException(ex.getMessage());
+
+        }
+
+    }
+
+    public String generateLoginToken (User user) {
 
         List <String> userRoles = user.getAuthorities()
                                       .stream()
@@ -39,7 +59,7 @@ public class TokenAuthService {
                       .withClaim("User Id", user.getId())
                       .withClaim("Roles", userRoles)
                       .withClaim("Is Active", user.getActive())
-                      .withExpiresAt(tokenExpirationInstant())
+                      .withExpiresAt(tokenExpirationInstantForLoggedUser())
                       .sign(algorithm);
 
         } catch (JWTCreationException ex) {
@@ -49,7 +69,6 @@ public class TokenAuthService {
         }
 
     }
-
 
 
     public String verifyToken (String token) {
@@ -82,7 +101,13 @@ public class TokenAuthService {
 
     }
 
-    private Instant tokenExpirationInstant () {
+    private Instant tokenExpirationInstantForPendingAccounts () {
+
+        return Instant.now().plusSeconds(720);
+
+    }
+
+    private Instant tokenExpirationInstantForLoggedUser () {
 
         return Instant.now().plusSeconds(3600);
 

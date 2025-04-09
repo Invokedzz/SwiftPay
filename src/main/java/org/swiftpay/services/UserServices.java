@@ -3,16 +3,14 @@ package org.swiftpay.services;
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import jakarta.transaction.Transactional;
+import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.swiftpay.dtos.LoginDTO;
-import org.swiftpay.dtos.ReactivateUserDTO;
-import org.swiftpay.dtos.RegisterDTO;
-import org.swiftpay.dtos.ViewAllUsersDTO;
+import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.ForbiddenAccessException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.DeleteRegister;
@@ -164,6 +162,31 @@ public class UserServices {
 
     }
 
+    public void activateUserAccount (String token) {
+
+        Hashids hashids = new Hashids("SHA-256");
+
+        long [] decodeId = hashids.decode(token);
+
+        long id = decodeId[0];
+
+        var searchForAccount = userRepository.findById(id)
+                                             .orElse(null);
+
+        if (searchForAccount != null) {
+
+            searchForAccount.activate();
+
+            userRepository.save(searchForAccount);
+
+            return;
+
+        }
+
+        throw new UserNotFoundException("We weren't able to find a user with this token: " + id);
+
+    }
+
     @Transactional
     @Scheduled(cron = "0 0 0 * * ?")
     protected void deleteInactiveAccounts () {
@@ -206,7 +229,7 @@ public class UserServices {
 
         var authentication = authenticationManager.authenticate(searchForUser);
 
-        return tokenAuthService.generateToken((User) authentication.getPrincipal());
+        return tokenAuthService.generateLoginToken((User) authentication.getPrincipal());
 
     }
 
@@ -270,7 +293,11 @@ public class UserServices {
 
     private void setupEmailLogic (User user) {
 
-        mailService.createEmailThenSend(user.getEmail());
+        Hashids hashids = new Hashids("SHA-256");
+
+        String token = hashids.encode(user.getId());
+
+        mailService.createEmailThenSend(user.getEmail(), token);
 
     }
 

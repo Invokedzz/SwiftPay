@@ -23,7 +23,7 @@ public class MailService {
 
     }
 
-    public void createEmailThenSend(String to) {
+    public void createEmailThenSend(String to, String token) {
 
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -36,6 +36,8 @@ public class MailService {
 
             var inputStream = Objects.requireNonNull(MailService.class.getResourceAsStream("/templates/email.html"));
             String emailContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+            emailContent = emailContent.replace("TOKEN_HERE", token);
 
             helper.setText(emailContent, true);
 

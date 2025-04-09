@@ -58,6 +58,9 @@ class UserServicesTest {
     @MockitoBean
     private TokenAuthService tokenAuthService;
 
+    @MockitoBean
+    private MailService mailService;
+
     @Test
     void setupClientRegister_ThenSave () {
 

@@ -56,6 +56,8 @@ public class UserServices {
 
     private final TokenAuthService tokenAuthService;
 
+    private final MailService mailService;
+
     public UserServices (UserRepository userRepository,
                          CPFValidator cpfValidator,
                          CNPJValidator cnpjValidator,
@@ -63,7 +65,8 @@ public class UserServices {
                          DeleteRegisterRepository deleteRegisterRepository,
                          RoleRepository roleRepository,
                          AuthenticationManager authenticationManager,
-                         TokenAuthService tokenAuthService) {
+                         TokenAuthService tokenAuthService,
+                         MailService mailService) {
 
         this.userRepository = userRepository;
 
@@ -80,6 +83,8 @@ public class UserServices {
         this.authenticationManager = authenticationManager;
 
         this.tokenAuthService = tokenAuthService;
+
+        this.mailService = mailService;
 
     }
 
@@ -229,6 +234,8 @@ public class UserServices {
 
             setupUserRolesAndSave(user);
 
+            setupEmailLogic(user);
+
         }
 
     }
@@ -258,6 +265,12 @@ public class UserServices {
             setupUserRolesAndSave(user);
 
         }
+
+    }
+
+    private void setupEmailLogic (User user) {
+
+        mailService.createEmailThenSend(user.getEmail());
 
     }
 

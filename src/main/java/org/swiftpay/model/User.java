@@ -55,7 +55,7 @@ public class User implements UserDetails {
 
         this.password = registerUserDTO.password();
 
-        this.active = true;
+        this.active = false;
 
     }
 

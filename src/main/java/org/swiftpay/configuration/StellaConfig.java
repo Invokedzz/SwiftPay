@@ -2,10 +2,10 @@ package org.swiftpay.configuration;
 
 import br.com.caelum.stella.validation.CNPJValidator;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 import br.com.caelum.stella.validation.CPFValidator;
 
-@Component
+@Configuration
 public class StellaConfig {
 
     @Bean

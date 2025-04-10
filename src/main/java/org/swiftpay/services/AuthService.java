@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.LoginDTO;
+import org.swiftpay.exceptions.AlreadyActiveException;
 import org.swiftpay.exceptions.ForbiddenAccessException;
 import org.swiftpay.exceptions.InvalidTokenException;
 import org.swiftpay.exceptions.NonActiveUserException;
@@ -63,6 +64,16 @@ public class AuthService {
         if (!sessionId.equals(sentId)) {
 
             throw new ForbiddenAccessException("You are not allowed to access this session");
+
+        }
+
+    }
+
+    public void checkIfUserIsAlreadyActive (Boolean isActive) {
+
+        if (isActive) {
+
+            throw new AlreadyActiveException("This user is already active!");
 
         }
 

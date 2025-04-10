@@ -64,7 +64,11 @@ public class ErrorsHandler {
 
             NonActiveUserException.class,
 
-            AlreadyActiveException.class
+            AlreadyActiveException.class,
+
+            InvalidCPFException.class,
+
+            InvalidCNPJException.class
 
     })
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {

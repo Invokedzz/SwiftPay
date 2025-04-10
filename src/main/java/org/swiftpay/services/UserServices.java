@@ -4,19 +4,14 @@ import jakarta.transaction.Transactional;
 import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.swiftpay.configuration.StellaConfig;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.*;
 import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
-import org.swiftpay.model.Wallet;
 import org.swiftpay.repositories.DeleteRegisterRepository;
-import org.swiftpay.repositories.RoleRepository;
 import org.swiftpay.repositories.UserRepository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -40,35 +35,25 @@ public class UserServices {
 
     private final UserRepository userRepository;
 
-    private final StellaConfig stellaConfig;
-
-    private final PasswordEncoder passwordEncoder;
-
     private final DeleteRegisterRepository deleteRegisterRepository;
 
-    private final RoleRepository roleRepository;
+    private final RolesService rolesService;
 
     private final AuthService authService;
 
     private final MailService mailService;
 
     public UserServices (UserRepository userRepository,
-                         StellaConfig stellaConfig,
-                         PasswordEncoder passwordEncoder,
                          DeleteRegisterRepository deleteRegisterRepository,
-                         RoleRepository roleRepository,
+                         RolesService rolesService,
                          AuthService authService,
                          MailService mailService) {
 
         this.userRepository = userRepository;
 
-        this.stellaConfig = stellaConfig;
-
-        this.passwordEncoder = passwordEncoder;
-
         this.deleteRegisterRepository = deleteRegisterRepository;
 
-        this.roleRepository = roleRepository;
+        this.rolesService = rolesService;
 
         this.authService = authService;
 
@@ -79,14 +64,26 @@ public class UserServices {
     @Transactional
     public void registerAsClient (RegisterDTO registerDTO) {
 
-        validateClientPropertiesBeforeRegisterThenSave(registerDTO);
+        var validatedClient = rolesService.validateClientPropertiesBeforeRegister(registerDTO);
+
+        userRepository.save(validatedClient);
+
+        rolesService.setupUserRolesAndSave(validatedClient);
+
+        mailService.setupConfirmationEmailLogic(validatedClient);
 
     }
 
     @Transactional
     public void registerAsSeller (RegisterDTO registerDTO) {
 
-        validateSellerPropertiesBeforeRegisterThenSave(registerDTO);
+        var validatedSeller = rolesService.validateSellerPropertiesBeforeRegister(registerDTO);
+
+        userRepository.save(validatedSeller);
+
+        rolesService.setupUserRolesAndSave(validatedSeller);
+
+        mailService.setupConfirmationEmailLogic(validatedSeller);
 
     }
 
@@ -112,7 +109,7 @@ public class UserServices {
 
         if (searchForAccount != null) {
 
-            checkIfUserIsAlreadyActive(searchForAccount.getActive());
+            authService.checkIfUserIsAlreadyActive(searchForAccount.getActive());
 
             searchForAccount.activate();
 
@@ -217,98 +214,5 @@ public class UserServices {
 
     }
 
-    private void validateClientPropertiesBeforeRegisterThenSave (RegisterDTO registerDTO) {
-
-        User user = new User(registerDTO);
-
-        Wallet wallet = new Wallet();
-
-        stellaConfig.cpfValidator().assertValid(user.getCpfCnpj());
-
-        if (stellaConfig.cpfValidator().isEligible(user.getCpfCnpj())) {
-
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
-
-            user.setPassword(encodedPassword);
-
-            wallet.setBalance(BigDecimal.valueOf(500.0));
-
-            wallet.setUser(user);
-
-            user.setWallet(wallet);
-
-            userRepository.save(user);
-
-            setupUserRolesAndSave(user);
-
-            mailService.setupConfirmationEmailLogic(user);
-
-        }
-
-    }
-
-    private void validateSellerPropertiesBeforeRegisterThenSave (RegisterDTO registerDTO) {
-
-        User user = new User(registerDTO);
-
-        Wallet wallet = new Wallet();
-
-        stellaConfig.cnpjValidator().assertValid(user.getCpfCnpj());
-
-        if (stellaConfig.cnpjValidator().isEligible(user.getCpfCnpj())) {
-
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
-
-            user.setPassword(encodedPassword);
-
-            wallet.setBalance(BigDecimal.valueOf(0.0));
-
-            wallet.setUser(user);
-
-            user.setWallet(wallet);
-
-            userRepository.save(user);
-
-            setupUserRolesAndSave(user);
-
-            mailService.setupConfirmationEmailLogic(user);
-
-        }
-
-    }
-
-    private void setupUserRolesAndSave (User user) {
-
-        if (stellaConfig.cpfValidator().isEligible(user.getCpfCnpj())) {
-
-            roleRepository.findById(1L).ifPresent(
-
-                    searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
-
-            );
-
-        }
-
-        else if (stellaConfig.cnpjValidator().isEligible(user.getCpfCnpj())) {
-
-            roleRepository.findById(2L).ifPresent(
-
-                    searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
-
-            );
-
-        }
-
-    }
-
-    private void checkIfUserIsAlreadyActive (Boolean isActive) {
-
-        if (isActive) {
-
-            throw new AlreadyActiveException("This user is already active!");
-
-        }
-
-    }
 
 }

@@ -2,10 +2,12 @@ package org.swiftpay.services;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.hashids.Hashids;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.swiftpay.exceptions.InvalidEmailFormatException;
+import org.swiftpay.model.User;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +24,23 @@ public class MailService {
 
     }
 
-    public void createConfirmationEmailThenSend (String to, String token) {
+    public void setupConfirmationEmailLogic (User user) {
+
+        Hashids hashids = new Hashids("SHA-256");
+
+        String token = hashids.encode(user.getId());
+
+        createConfirmationEmailThenSend(user.getEmail(), token);
+
+    }
+
+    public void setupDeletionEmailLogic (String email) {
+
+        createDeletionEmailThenSend(email);
+
+    }
+
+    private void createConfirmationEmailThenSend (String to, String token) {
 
         MimeMessage message = mailSender.createMimeMessage();
 
@@ -50,7 +68,7 @@ public class MailService {
 
     }
 
-    public void createDeletionEmailThenSend (String to) {
+    private void createDeletionEmailThenSend (String to) {
 
 
         MimeMessage message = mailSender.createMimeMessage();

@@ -1,16 +1,12 @@
 package org.swiftpay.services;
 
-import br.com.caelum.stella.validation.CNPJValidator;
-import br.com.caelum.stella.validation.CPFValidator;
-import com.nimbusds.jwt.SignedJWT;
 import jakarta.transaction.Transactional;
 import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.swiftpay.configuration.StellaConfig;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.*;
 import org.swiftpay.model.DeleteRegister;
@@ -21,7 +17,6 @@ import org.swiftpay.repositories.RoleRepository;
 import org.swiftpay.repositories.UserRepository;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -45,9 +40,7 @@ public class UserServices {
 
     private final UserRepository userRepository;
 
-    private final CPFValidator cpfValidator;
-
-    private final CNPJValidator cnpjValidator;
+    private final StellaConfig stellaConfig;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -55,27 +48,21 @@ public class UserServices {
 
     private final RoleRepository roleRepository;
 
-    private final AuthenticationManager authenticationManager;
-
-    private final TokenAuthService tokenAuthService;
+    private final AuthService authService;
 
     private final MailService mailService;
 
     public UserServices (UserRepository userRepository,
-                         CPFValidator cpfValidator,
-                         CNPJValidator cnpjValidator,
+                         StellaConfig stellaConfig,
                          PasswordEncoder passwordEncoder,
                          DeleteRegisterRepository deleteRegisterRepository,
                          RoleRepository roleRepository,
-                         AuthenticationManager authenticationManager,
-                         TokenAuthService tokenAuthService,
+                         AuthService authService,
                          MailService mailService) {
 
         this.userRepository = userRepository;
 
-        this.cpfValidator = cpfValidator;
-
-        this.cnpjValidator = cnpjValidator;
+        this.stellaConfig = stellaConfig;
 
         this.passwordEncoder = passwordEncoder;
 
@@ -83,9 +70,7 @@ public class UserServices {
 
         this.roleRepository = roleRepository;
 
-        this.authenticationManager = authenticationManager;
-
-        this.tokenAuthService = tokenAuthService;
+        this.authService = authService;
 
         this.mailService = mailService;
 
@@ -107,7 +92,7 @@ public class UserServices {
 
     public String login (LoginDTO loginDTO) {
 
-        return validateLoginPropertiesThenGenerateToken(loginDTO);
+        return authService.validateLoginPropertiesThenGenerateToken(loginDTO);
 
     }
 
@@ -151,7 +136,7 @@ public class UserServices {
 
         if (searchForAccount != null) {
 
-            compareIdFromTheSessionWithTheIdInTheUrl(headers, searchForAccount.getId());
+            authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
 
             searchForAccount.deactivate();
 
@@ -161,7 +146,7 @@ public class UserServices {
 
             userRepository.save(searchForAccount);
 
-            setupDeletionEmailLogic(searchForAccount.getEmail());
+            mailService.setupDeletionEmailLogic(searchForAccount.getEmail());
 
             return;
 
@@ -232,43 +217,15 @@ public class UserServices {
 
     }
 
-    private String validateLoginPropertiesThenGenerateToken (LoginDTO loginDTO) {
-
-        try {
-
-            var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
-
-            var authentication = authenticationManager.authenticate(searchForUser);
-
-            var token = tokenAuthService.generateLoginToken((User) authentication.getPrincipal());
-
-            var signedJWT = SignedJWT.parse(token);
-
-            if (signedJWT.getJWTClaimsSet().getClaim("Is Active").equals(Boolean.FALSE)) {
-
-                throw new NonActiveUserException("This account is not active. Please, try to activate it!");
-
-            }
-
-            return token;
-
-        } catch (ParseException ex) {
-
-            throw new InvalidTokenException("Something went wrong while parsing the token. Please, try again.");
-
-        }
-
-    }
-
     private void validateClientPropertiesBeforeRegisterThenSave (RegisterDTO registerDTO) {
 
         User user = new User(registerDTO);
 
         Wallet wallet = new Wallet();
 
-        cpfValidator.assertValid(user.getCpfCnpj());
+        stellaConfig.cpfValidator().assertValid(user.getCpfCnpj());
 
-        if (cpfValidator.isEligible(user.getCpfCnpj())) {
+        if (stellaConfig.cpfValidator().isEligible(user.getCpfCnpj())) {
 
             String encodedPassword = passwordEncoder.encode(user.getPassword());
 
@@ -284,7 +241,7 @@ public class UserServices {
 
             setupUserRolesAndSave(user);
 
-            setupConfirmationEmailLogic(user);
+            mailService.setupConfirmationEmailLogic(user);
 
         }
 
@@ -296,9 +253,9 @@ public class UserServices {
 
         Wallet wallet = new Wallet();
 
-        cnpjValidator.assertValid(user.getCpfCnpj());
+        stellaConfig.cnpjValidator().assertValid(user.getCpfCnpj());
 
-        if (cnpjValidator.isEligible(user.getCpfCnpj())) {
+        if (stellaConfig.cnpjValidator().isEligible(user.getCpfCnpj())) {
 
             String encodedPassword = passwordEncoder.encode(user.getPassword());
 
@@ -314,7 +271,7 @@ public class UserServices {
 
             setupUserRolesAndSave(user);
 
-            setupConfirmationEmailLogic(user);
+            mailService.setupConfirmationEmailLogic(user);
 
         }
 
@@ -322,7 +279,7 @@ public class UserServices {
 
     private void setupUserRolesAndSave (User user) {
 
-        if (cpfValidator.isEligible(user.getCpfCnpj())) {
+        if (stellaConfig.cpfValidator().isEligible(user.getCpfCnpj())) {
 
             roleRepository.findById(1L).ifPresent(
 
@@ -332,25 +289,13 @@ public class UserServices {
 
         }
 
-        else if (cnpjValidator.isEligible(user.getCpfCnpj())) {
+        else if (stellaConfig.cnpjValidator().isEligible(user.getCpfCnpj())) {
 
             roleRepository.findById(2L).ifPresent(
 
                     searchForRoles -> roleRepository.insertRole(user.getId(), searchForRoles.getId())
 
             );
-
-        }
-
-    }
-
-    private void compareIdFromTheSessionWithTheIdInTheUrl (HttpHeaders headers, Long sentId) {
-
-        Long sessionId = tokenAuthService.findSessionId(headers);
-
-        if (!sessionId.equals(sentId)) {
-
-            throw new ForbiddenAccessException("You are not allowed to access this session");
 
         }
 
@@ -363,22 +308,6 @@ public class UserServices {
             throw new AlreadyActiveException("This user is already active!");
 
         }
-
-    }
-
-    private void setupConfirmationEmailLogic (User user) {
-
-        Hashids hashids = new Hashids("SHA-256");
-
-        String token = hashids.encode(user.getId());
-
-        mailService.createConfirmationEmailThenSend(user.getEmail(), token);
-
-    }
-
-    private void setupDeletionEmailLogic (String email) {
-
-        mailService.createDeletionEmailThenSend(email);
 
     }
 

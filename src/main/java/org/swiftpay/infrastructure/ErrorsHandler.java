@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.swiftpay.dtos.ErrorDTO;
 import org.swiftpay.exceptions.ForbiddenAccessException;
+import org.swiftpay.exceptions.NonActiveUserException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.exceptions.UsernameNotFoundException;
 
@@ -52,7 +53,7 @@ public class ErrorsHandler {
 
     }
 
-    @ExceptionHandler({InvalidStateException.class, BadRequestException.class})
+    @ExceptionHandler({InvalidStateException.class, BadRequestException.class, NonActiveUserException.class})
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {
 
         ErrorDTO response = new ErrorDTO(

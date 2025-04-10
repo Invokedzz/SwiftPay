@@ -22,26 +22,6 @@ public class TokenAuthService {
     @Value("spring.security.oauth2.client.registration")
     private String secret;
 
-    public String generatePreAccountConfirmationToken (User user) {
-
-        try {
-
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-
-            return JWT.create()
-                    .withClaim("User Id", user.getId())
-                    .withClaim("Is Active", user.getActive())
-                    .withIssuer("SwiftPayments").withExpiresAt(tokenExpirationInstantForPendingAccounts())
-                    .sign(algorithm);
-
-        } catch (JWTCreationException ex) {
-
-            throw new TokenCreationException(ex.getMessage());
-
-        }
-
-    }
-
     public String generateLoginToken (User user) {
 
         List <String> userRoles = user.getAuthorities()
@@ -101,9 +81,13 @@ public class TokenAuthService {
 
     }
 
-    private Instant tokenExpirationInstantForPendingAccounts () {
+    public Boolean findUserStatus (HttpHeaders headers) {
 
-        return Instant.now().plusSeconds(720);
+        String token = Objects.requireNonNull(headers.get("Authorization")).getFirst();
+
+        String jwt = token.replace("Bearer ", "");
+
+        return JWT.decode(jwt).getClaim("Is Active").asBoolean();
 
     }
 

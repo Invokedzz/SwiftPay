@@ -2,6 +2,7 @@ package org.swiftpay.services;
 
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
+import com.nimbusds.jwt.SignedJWT;
 import jakarta.transaction.Transactional;
 import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.ForbiddenAccessException;
+import org.swiftpay.exceptions.InvalidTokenException;
+import org.swiftpay.exceptions.NonActiveUserException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
@@ -21,6 +24,7 @@ import org.swiftpay.repositories.RoleRepository;
 import org.swiftpay.repositories.UserRepository;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -33,8 +37,12 @@ public class UserServices {
 
         Adjusts I need to make:
 
-        validate the user id in the "disableUserAccount" method, then create permissions using Spring Security
+        validate the user id in the "disableUserAccount" method, then create permissions using Spring Security -> Finished
         After that, I need to set up the email sender for functions like "reactivate and disable"
+
+        Ps: What If I Implement the email sender only to register users account? :D
+
+        Try to fix login method, and only permit users where the active is true
 
     */
 
@@ -183,7 +191,7 @@ public class UserServices {
 
         }
 
-        throw new UserNotFoundException("We weren't able to find a user with this token: " + id);
+        throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
 
     }
 
@@ -225,11 +233,29 @@ public class UserServices {
 
     private String validateLoginPropertiesThenGenerateToken (LoginDTO loginDTO) {
 
-        var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
+        try {
 
-        var authentication = authenticationManager.authenticate(searchForUser);
+            var searchForUser = new UsernamePasswordAuthenticationToken(loginDTO.username(), loginDTO.password());
 
-        return tokenAuthService.generateLoginToken((User) authentication.getPrincipal());
+            var authentication = authenticationManager.authenticate(searchForUser);
+
+            var token = tokenAuthService.generateLoginToken((User) authentication.getPrincipal());
+
+            var signedJWT = SignedJWT.parse(token);
+
+            if (signedJWT.getJWTClaimsSet().getClaim("Is Active").equals(Boolean.FALSE)) {
+
+                throw new NonActiveUserException("This account is not active. Please, try to activate it!");
+
+            }
+
+            return token;
+
+        } catch (ParseException ex) {
+
+            throw new InvalidTokenException("Something went wrong while parsing the token. Please, try again.");
+
+        }
 
     }
 
@@ -286,6 +312,8 @@ public class UserServices {
             userRepository.save(user);
 
             setupUserRolesAndSave(user);
+
+            setupEmailLogic(user);
 
         }
 

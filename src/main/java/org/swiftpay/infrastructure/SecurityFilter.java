@@ -6,8 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.swiftpay.model.User;
 import org.swiftpay.services.TokenAuthService;
 import org.swiftpay.services.UserDetailsServiceImpl;
 
@@ -39,9 +41,25 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             var subject = tokenAuthService.verifyToken(token);
 
-            var user = userDetailsService.loadUserByUsername(subject);
+            var userDetails = userDetailsService.loadUserByUsername(subject);
 
-            var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            if (userDetails instanceof User user && !user.getActive()) {
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                response.getWriter().write("User account is deactivated.");
+
+                return;
+
+            }
+
+            var auth = new UsernamePasswordAuthenticationToken(
+
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+
+            );
 
             SecurityContextHolder.getContext().setAuthentication(auth);
 

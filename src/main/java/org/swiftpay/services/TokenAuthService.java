@@ -81,16 +81,6 @@ public class TokenAuthService {
 
     }
 
-    public Boolean findUserStatus (HttpHeaders headers) {
-
-        String token = Objects.requireNonNull(headers.get("Authorization")).getFirst();
-
-        String jwt = token.replace("Bearer ", "");
-
-        return JWT.decode(jwt).getClaim("Is Active").asBoolean();
-
-    }
-
     private Instant tokenExpirationInstantForLoggedUser () {
 
         return Instant.now().plusSeconds(3600);

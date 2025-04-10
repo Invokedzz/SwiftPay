@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 compose.yaml
 src/main/resources/application.properties
-src/main/resources/templates/email.html
+src/main/resources/templates
 
 ### STS ###
 .apt_generated

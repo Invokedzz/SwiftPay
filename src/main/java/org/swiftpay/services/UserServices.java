@@ -37,12 +37,12 @@ public class UserServices {
 
         Adjusts I need to make:
 
-        validate the user id in the "disableUserAccount" method, then create permissions using Spring Security -> Finished
+        validate the user id in the "disableUserAccount" method, then create permissions using Spring Security -> Done!
         After that, I need to set up the email sender for functions like "reactivate and disable"
 
         Ps: What If I Implement the email sender only to register users account? :D
 
-        Try to fix login method, and only permit users where the active is true
+        Try to fix login method, and only permit users where the active is true -> Done!
 
     */
 
@@ -161,6 +161,8 @@ public class UserServices {
             deleteRegisterRepository.save(addUserToRegister);
 
             userRepository.save(searchForAccount);
+
+            setupDeletionEmailLogic(searchForAccount.getEmail());
 
             return;
 
@@ -283,7 +285,7 @@ public class UserServices {
 
             setupUserRolesAndSave(user);
 
-            setupEmailLogic(user);
+            setupConfirmationEmailLogic(user);
 
         }
 
@@ -313,19 +315,9 @@ public class UserServices {
 
             setupUserRolesAndSave(user);
 
-            setupEmailLogic(user);
+            setupConfirmationEmailLogic(user);
 
         }
-
-    }
-
-    private void setupEmailLogic (User user) {
-
-        Hashids hashids = new Hashids("SHA-256");
-
-        String token = hashids.encode(user.getId());
-
-        mailService.createEmailThenSend(user.getEmail(), token);
 
     }
 
@@ -362,6 +354,22 @@ public class UserServices {
             throw new ForbiddenAccessException("You are not allowed to access this session");
 
         }
+
+    }
+
+    private void setupConfirmationEmailLogic (User user) {
+
+        Hashids hashids = new Hashids("SHA-256");
+
+        String token = hashids.encode(user.getId());
+
+        mailService.createConfirmationEmailThenSend(user.getEmail(), token);
+
+    }
+
+    private void setupDeletionEmailLogic (String email) {
+
+        mailService.createDeletionEmailThenSend(email);
 
     }
 

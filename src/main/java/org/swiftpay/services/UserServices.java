@@ -12,10 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
-import org.swiftpay.exceptions.ForbiddenAccessException;
-import org.swiftpay.exceptions.InvalidTokenException;
-import org.swiftpay.exceptions.NonActiveUserException;
-import org.swiftpay.exceptions.UserNotFoundException;
+import org.swiftpay.exceptions.*;
 import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
 import org.swiftpay.model.Wallet;
@@ -130,6 +127,8 @@ public class UserServices {
 
         if (searchForAccount != null) {
 
+            checkIfUserIsAlreadyActive(searchForAccount.getActive());
+
             searchForAccount.activate();
 
             userRepository.save(searchForAccount);
@@ -198,7 +197,7 @@ public class UserServices {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 30 12 * * ?")
     protected void deleteInactiveAccounts () {
 
         var allDeleteRegisters = deleteRegisterRepository.findAll();
@@ -352,6 +351,16 @@ public class UserServices {
         if (!sessionId.equals(sentId)) {
 
             throw new ForbiddenAccessException("You are not allowed to access this session");
+
+        }
+
+    }
+
+    private void checkIfUserIsAlreadyActive (Boolean isActive) {
+
+        if (isActive) {
+
+            throw new AlreadyActiveException("This user is already active!");
 
         }
 

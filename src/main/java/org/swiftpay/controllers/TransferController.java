@@ -1,6 +1,9 @@
 package org.swiftpay.controllers;
 
-public class TransferController {
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public record TransferController () {
 
 
 

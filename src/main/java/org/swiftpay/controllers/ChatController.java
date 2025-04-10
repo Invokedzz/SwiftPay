@@ -4,14 +4,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.swiftpay.services.AIAssistantService;
 
 @RestController
-public class ChatController {
+public record ChatController (AIAssistantService aiAssistantService) {
 
-    private final AIAssistantService aiAssistantService;
 
-    public ChatController (AIAssistantService aiAssistantService) {
-
-        this.aiAssistantService = aiAssistantService;
-
-    }
 
 }

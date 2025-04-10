@@ -1,6 +1,5 @@
 package org.swiftpay.configuration;
 
-import com.nimbusds.jwt.SignedJWT;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,8 +31,8 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(custom -> custom.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account").permitAll())
-                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/reactivate-account", "/all").hasRole("CLIENT"))
+                .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account", "/reactivate-account").permitAll())
+                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/all").hasRole("CLIENT"))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

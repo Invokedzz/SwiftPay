@@ -11,18 +11,10 @@ import org.swiftpay.services.UserServices;
 import java.util.Set;
 
 @RestController
-public class UserController {
-
-    private final UserServices userServices;
-
-    public UserController (UserServices userServices) {
-
-        this.userServices = userServices;
-
-    }
+public record UserController (UserServices userServices) {
 
     @PostMapping("/register/client")
-    protected ResponseEntity <Void> clientRegister (@Valid @RequestBody RegisterDTO registerDTO) {
+    private ResponseEntity <Void> clientRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
         userServices.registerAsClient(registerDTO);
 
@@ -31,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/register/seller")
-    protected ResponseEntity <Void> sellerRegister (@Valid @RequestBody RegisterDTO registerDTO) {
+    private ResponseEntity <Void> sellerRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
         userServices.registerAsSeller(registerDTO);
 
@@ -40,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/activate-account")
-    protected ResponseEntity <Void> activateAccount (@RequestHeader String token) {
+    private ResponseEntity <Void> activateAccount (@RequestHeader String token) {
 
         userServices.activateUserAccount(token);
 
@@ -49,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    protected ResponseEntity <UserTokenDTO> login (@Valid @RequestBody LoginDTO loginDTO) {
+    private ResponseEntity <UserTokenDTO> login (@Valid @RequestBody LoginDTO loginDTO) {
 
         var generatedToken = userServices.login(loginDTO);
 
@@ -58,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    protected ResponseEntity <Set<ViewAllUsersDTO>> getAllUsers () {
+    private ResponseEntity <Set<ViewAllUsersDTO>> getAllUsers () {
 
         var users = userServices.getUsers();
 
@@ -67,7 +59,7 @@ public class UserController {
     }
 
     @PutMapping("/reactivate-account")
-    protected ResponseEntity <Void> reactivateUser (@RequestBody ReactivateUserDTO reactivateUserDTO) {
+    private ResponseEntity <Void> reactivateUser (@RequestBody ReactivateUserDTO reactivateUserDTO) {
 
         userServices.reactivateUserAccount(reactivateUserDTO);
 
@@ -76,7 +68,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete-account/{id}")
-    protected ResponseEntity <Void> disableUser (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+    private ResponseEntity <Void> disableUser (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
 
         userServices.disableUserAccount(headers, id);
 

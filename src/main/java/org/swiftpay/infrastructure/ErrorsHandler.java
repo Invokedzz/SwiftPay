@@ -9,17 +9,20 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.swiftpay.dtos.ErrorDTO;
-import org.swiftpay.exceptions.ForbiddenAccessException;
-import org.swiftpay.exceptions.NonActiveUserException;
-import org.swiftpay.exceptions.UserNotFoundException;
-import org.swiftpay.exceptions.UsernameNotFoundException;
+import org.swiftpay.exceptions.*;
 
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class ErrorsHandler {
 
-    @ExceptionHandler({UserNotFoundException.class, UsernameNotFoundException.class})
+    @ExceptionHandler({
+
+            UserNotFoundException.class,
+
+            UsernameNotFoundException.class
+
+    })
     public ResponseEntity <ErrorDTO> handleUserNotFoundException(UserNotFoundException ex) {
 
         ErrorDTO response = new ErrorDTO(
@@ -53,7 +56,17 @@ public class ErrorsHandler {
 
     }
 
-    @ExceptionHandler({InvalidStateException.class, BadRequestException.class, NonActiveUserException.class})
+    @ExceptionHandler({
+
+            InvalidStateException.class,
+
+            BadRequestException.class,
+
+            NonActiveUserException.class,
+
+            AlreadyActiveException.class
+
+    })
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {
 
         ErrorDTO response = new ErrorDTO(
@@ -68,7 +81,13 @@ public class ErrorsHandler {
 
     }
 
-    @ExceptionHandler({RuntimeException.class, Exception.class})
+    @ExceptionHandler({
+
+            RuntimeException.class,
+
+            Exception.class
+
+    })
     public ResponseEntity <ErrorDTO> handleExceptions(Exception ex) {
 
         ErrorDTO errorMessage = new ErrorDTO(

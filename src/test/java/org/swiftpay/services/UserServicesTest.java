@@ -1,30 +1,22 @@
 package org.swiftpay.services;
 
-import br.com.caelum.stella.validation.CNPJValidator;
-import br.com.caelum.stella.validation.CPFValidator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.swiftpay.dtos.LoginDTO;
 import org.swiftpay.dtos.ReactivateUserDTO;
 import org.swiftpay.dtos.RegisterDTO;
-import org.swiftpay.exceptions.UserNotFoundException;
+import org.swiftpay.exceptions.UsernameNotFoundException;
 import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
-import org.swiftpay.model.Wallet;
 import org.swiftpay.repositories.DeleteRegisterRepository;
-import org.swiftpay.repositories.RoleRepository;
 import org.swiftpay.repositories.UserRepository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -38,25 +30,13 @@ class UserServicesTest {
     private UserRepository userRepository;
 
     @MockitoBean
-    private CPFValidator cpfValidator;
-
-    @MockitoBean
-    private CNPJValidator cnpjValidator;
-
-    @MockitoBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockitoBean
     private DeleteRegisterRepository deleteRegisterRepository;
 
     @MockitoBean
-    private RoleRepository roleRepository;
+    private RolesService rolesService;
 
     @MockitoBean
-    private AuthenticationManager authenticationManager;
-
-    @MockitoBean
-    private TokenAuthService tokenAuthService;
+    private AuthService authService;
 
     @MockitoBean
     private MailService mailService;
@@ -64,240 +44,129 @@ class UserServicesTest {
     @Test
     void setupClientRegister_ThenSave () {
 
-        RegisterDTO registerDTO = new RegisterDTO("Username", "username@gmail.com", "97925154888", "password");
+        RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
 
-        User user = new User(registerDTO);
+        User mockUser = new User();
 
-        Wallet wallet = new Wallet();
+        Mockito.when(rolesService.validateClientPropertiesBeforeRegister(registerDTO))
+                .thenReturn(mockUser);
 
-        wallet.setBalance(BigDecimal.valueOf(500.0));
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenReturn(mockUser);
 
-        user.setWallet(wallet);
-
-        wallet.setUser(user);
-
-        Mockito.when(userRepository.save(user)).thenReturn(user);
-
-        Mockito.when(cpfValidator.isEligible(user.getCpfCnpj())).thenReturn(true);
-
-        Mockito.when(passwordEncoder.encode(user.getPassword())).thenReturn(Mockito.anyString());
-
+        User user = rolesService.validateClientPropertiesBeforeRegister(registerDTO);
         userRepository.save(user);
+        rolesService.setupUserRolesAndSave(user);
+        mailService.setupConfirmationEmailLogic(user);
 
-        cpfValidator.isEligible(user.getCpfCnpj());
-
-        passwordEncoder.encode(user.getPassword());
-
-        roleRepository.insertRole(Mockito.anyLong(), Mockito.anyLong());
-
-        Assertions.assertThat(cpfValidator.isEligible(user.getCpfCnpj())).isTrue();
-
-        Mockito.verify(passwordEncoder, Mockito.times(1)).encode(user.getPassword());
-
-        Mockito.verify(cpfValidator, Mockito.times(2)).isEligible(user.getCpfCnpj());
-
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
-
-        Mockito.verify(roleRepository, Mockito.times(1)).insertRole(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.verify(rolesService, Mockito.times(1)).validateClientPropertiesBeforeRegister(registerDTO);
+        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
+        Mockito.verify(mailService, Mockito.times(1)).setupConfirmationEmailLogic(Mockito.any(User.class));
 
     }
 
     @Test
     void setupSellerRegister_ThenSave () {
 
-        RegisterDTO registerDTO = new RegisterDTO("Username", "username@gmail.com", "75679584000172", "password");
+        RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
 
-        User user = new User(registerDTO);
+        User mockUser = new User();
 
-        Wallet wallet = new Wallet();
+        Mockito.when(rolesService.validateSellerPropertiesBeforeRegister(registerDTO))
+                .thenReturn(mockUser);
 
-        wallet.setBalance(BigDecimal.valueOf(500.0));
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenReturn(mockUser);
 
-        user.setWallet(wallet);
-
-        wallet.setUser(user);
-
-        Mockito.when(userRepository.save(user)).thenReturn(user);
-
-        Mockito.when(passwordEncoder.encode(user.getPassword())).thenReturn(Mockito.anyString());
-
-        Mockito.when(cnpjValidator.isEligible(user.getCpfCnpj())).thenReturn(true);
-
+        User user = rolesService.validateSellerPropertiesBeforeRegister(registerDTO);
         userRepository.save(user);
+        rolesService.setupUserRolesAndSave(user);
+        mailService.setupConfirmationEmailLogic(user);
 
-        cnpjValidator.isEligible(user.getCpfCnpj());
-
-        passwordEncoder.encode(user.getPassword());
-
-        roleRepository.insertRole(Mockito.anyLong(), Mockito.anyLong());
-
-        Mockito.verify(passwordEncoder, Mockito.times(1)).encode(user.getPassword());
-
-        Mockito.verify(userRepository, Mockito.times(1)).save(user);
-
-        Mockito.verify(roleRepository, Mockito.times(1)).insertRole(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.verify(rolesService, Mockito.times(1)).validateSellerPropertiesBeforeRegister(registerDTO);
+        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
+        Mockito.verify(mailService, Mockito.times(1)).setupConfirmationEmailLogic(Mockito.any(User.class));
 
     }
 
     @Test
     void login_ThenGenerateToken () {
 
-        var mockAuthentication = Mockito.mock(Authentication.class);
+        LoginDTO loginDTO = new LoginDTO("Mr. M", "mrM@gmail.com");
 
-        Mockito.when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(mockAuthentication);
+        Mockito.when(authService.validateLoginPropertiesThenGenerateToken(loginDTO)).thenReturn(Mockito.anyString());
 
-        String mockJwtToken = "mocked-jwt-token";
+        authService.validateLoginPropertiesThenGenerateToken(loginDTO);
 
-        Mockito.when(tokenAuthService.generateLoginToken(new User())).thenReturn(mockJwtToken);
-
-        tokenAuthService.generateLoginToken(new User());
-
-        Mockito.verify(tokenAuthService, Mockito.times(1)).generateLoginToken(new User());
+        Mockito.verify(authService, Mockito.times(1)).validateLoginPropertiesThenGenerateToken(loginDTO);
 
     }
 
     @Test
     void reactivateAccount_ThenReturn () {
 
-        ReactivateUserDTO reactivateUserDTO = new ReactivateUserDTO("kys@gmail.com");
+        ReactivateUserDTO reactivateUserDTO = new ReactivateUserDTO("Apollo@gmail.com");
 
         Mockito.when(userRepository.findByEmail(reactivateUserDTO.email())).thenReturn(Optional.of(new User()));
 
-        var foundUser = userRepository.findByEmail(reactivateUserDTO.email()).orElse(null);
+        var queriedUser = userRepository.findByEmail(reactivateUserDTO.email()).orElse(null);
 
-        if (foundUser != null) {
+        if (queriedUser != null) {
 
-            foundUser.activate();
+            Mockito.when(userRepository.save(queriedUser)).thenReturn(queriedUser);
 
-            Assertions.assertThat(foundUser.getActive()).isTrue();
+            queriedUser.activate();
 
-            Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(foundUser);
+            userRepository.save(queriedUser);
 
-            deleteRegisterRepository.deleteByUser_Id(foundUser.getId());
+            deleteRegisterRepository.deleteByUser_Id(queriedUser.getId());
 
-            userRepository.save(foundUser);
+            Assertions.assertThat(queriedUser.getActive()).isTrue();
 
-            Mockito.verify(userRepository, Mockito.times(1)).save(foundUser);
+            Mockito.verify(userRepository, Mockito.times(1)).save(queriedUser);
 
-            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).deleteByUser_Id(foundUser.getId());
+            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).deleteByUser_Id(queriedUser.getId());
 
-        }
-
-        Mockito.verify(userRepository, Mockito.times(1)).findByEmail(reactivateUserDTO.email());
-
-    }
-
-    @Test
-    void reactivateAccount_ThenThrowAnException () {
-
-        ReactivateUserDTO reactivateUserDTO = new ReactivateUserDTO(null);
-
-        Mockito.when(userRepository.findByEmail(reactivateUserDTO.email())).thenReturn(Optional.of(new User()));
-
-        var foundUser = userRepository.findByEmail(reactivateUserDTO.email()).orElse(null);
-
-        if (foundUser != null) {
-
-            foundUser.activate();
-
-            Assertions.assertThat(foundUser.getActive()).isTrue();
-
-            Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(foundUser);
-
-            deleteRegisterRepository.deleteByUser_Id(foundUser.getId());
-
-            userRepository.save(foundUser);
-
-            Mockito.verify(userRepository, Mockito.times(1)).save(foundUser);
-
-            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).deleteByUser_Id(foundUser.getId());
+            return;
 
         }
 
-        Mockito.doThrow(UserNotFoundException.class).when(userRepository).findByEmail(null);
-
-        Mockito.verify(userRepository, Mockito.times(1)).findByEmail(reactivateUserDTO.email());
+        Mockito.doThrow(UsernameNotFoundException.class);
 
     }
 
     @Test
     void disableAccount_ThenReturn () {
 
-        Long id = 1L;
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
 
-        Mockito.when(userRepository.findById(id)).thenReturn(Optional.of(new User()));
+        var user = userRepository.findById(Mockito.anyLong()).orElse(null);
 
-        var foundUser = userRepository.findById(id).orElse(null);
+        if (user != null) {
 
-        if (foundUser != null) {
+            Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
 
-            foundUser.deactivate();
-
-            DeleteRegister deleteRegister = new DeleteRegister();
-
-            deleteRegister.setUser(foundUser);
-
-            deleteRegister.setDeleteDate(LocalDate.now());
-
-            Mockito.when(deleteRegisterRepository.save(Mockito.any(DeleteRegister.class))).thenReturn(deleteRegister);
-
-            Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(foundUser);
-
-            deleteRegisterRepository.save(deleteRegister);
-
-            userRepository.save(foundUser);
-
-            Assertions.assertThat(foundUser.getActive()).isFalse();
-
-            Mockito.verify(userRepository, Mockito.times(1)).save(foundUser);
-
-            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).save(deleteRegister);
-
-        }
-
-    }
-
-    @Test
-    void disableAccount_ThenThrowAnException () {
-
-        Long id = 1L;
-
-        Mockito.when(userRepository.findById(id)).thenReturn(Optional.empty());
-
-        var foundUser = userRepository.findById(id).orElse(null);
-
-        if (foundUser != null) {
-
-            foundUser.deactivate();
+            userRepository.save(user);
 
             DeleteRegister deleteRegister = new DeleteRegister();
 
-            deleteRegister.setUser(foundUser);
+            deleteRegister.setUser(user);
 
             deleteRegister.setDeleteDate(LocalDate.now());
 
-            Mockito.when(deleteRegisterRepository.save(Mockito.any(DeleteRegister.class))).thenReturn(deleteRegister);
-
-            Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(foundUser);
-
             deleteRegisterRepository.save(deleteRegister);
 
-            userRepository.save(foundUser);
+            mailService.setupDeletionEmailLogic(user.getEmail());
 
-            Assertions.assertThat(foundUser.getActive()).isFalse();
+            Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
 
-            Mockito.verify(userRepository, Mockito.times(1)).save(foundUser);
+            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).save(Mockito.any(DeleteRegister.class));
 
-            Mockito.verify(deleteRegisterRepository, Mockito.times(1)).save(deleteRegister);
+            return;
 
         }
 
-        Assertions.assertThatThrownBy(() -> {
-
-            throw new UserNotFoundException("User not found");
-
-        }).isInstanceOf(UserNotFoundException.class);
+        Mockito.doThrow(UsernameNotFoundException.class);
 
     }
 

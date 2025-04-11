@@ -60,7 +60,7 @@ public class RolesService {
 
         }
 
-        throw new InvalidCPFException("sex");
+        throw new InvalidCPFException("Invalid CPF format. Please, try again.");
 
     }
 
@@ -88,7 +88,7 @@ public class RolesService {
 
         }
 
-        throw new InvalidCNPJException("sex");
+        throw new InvalidCNPJException("Invalid CNPJ format. Please, try again.");
 
     }
 

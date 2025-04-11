@@ -49,9 +49,11 @@ public class MailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
+
             helper.setSubject("Welcome to SwiftPay – Confirm Your Account");
 
             var inputStream = Objects.requireNonNull(MailService.class.getResourceAsStream("/templates/confirmation-email.html"));
+
             String emailContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             emailContent = emailContent.replace("TOKEN_HERE", token);
@@ -78,9 +80,11 @@ public class MailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
+
             helper.setSubject("Account Deletion Confirmation");
 
             var inputStream = Objects.requireNonNull(MailService.class.getResourceAsStream("/templates/deletion-email.html"));
+
             String emailContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             helper.setText(emailContent, true);

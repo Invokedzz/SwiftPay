@@ -4,8 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 compose.yaml
-src/main/resources/application.properties
 src/main/resources/templates
+src/main/resources/application-dev.properties
 
 ### STS ###
 .apt_generated

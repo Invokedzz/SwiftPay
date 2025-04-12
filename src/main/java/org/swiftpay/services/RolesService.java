@@ -24,7 +24,10 @@ public class RolesService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public RolesService (RoleRepository roleRepository, CPFValidator cpfValidator, CNPJValidator cnpjValidator, PasswordEncoder passwordEncoder) {
+    public RolesService (RoleRepository roleRepository,
+                         CPFValidator cpfValidator,
+                         CNPJValidator cnpjValidator,
+                         PasswordEncoder passwordEncoder) {
 
         this.roleRepository = roleRepository;
 

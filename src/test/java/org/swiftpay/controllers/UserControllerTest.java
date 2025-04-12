@@ -12,10 +12,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.swiftpay.dtos.AccountDTO;
 import org.swiftpay.dtos.LoginDTO;
 import org.swiftpay.dtos.ReactivateUserDTO;
 import org.swiftpay.dtos.RegisterDTO;
+import org.swiftpay.model.User;
+import org.swiftpay.model.Wallet;
 import org.swiftpay.services.UserServices;
+
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,12 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = UserController.class)
 class UserControllerTest {
 
-    /*
-
-    Tests that we need to make: Register, Login, ReactivateAccount, DisableAccount;
-
-    */
-
     @MockitoBean
     private UserServices userServices;
 
@@ -39,108 +38,125 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void registerClient_ThenReturnCREATED () throws Exception {
+    void registerClient_ThenReturnCREATED() throws Exception {
 
         RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
-                                        "76323556855", "123456");
+                "76323556855", "123456");
 
-        var mockUserServices = Mockito.mock(UserServices.class);
-
-        mockUserServices.registerAsClient(registerDTO);
+        Mockito.doNothing().when(userServices).registerAsClient(registerDTO);
 
         mockMvc.perform(post("/register/client")
-                .contentType("application/json").content(new ObjectMapper().writeValueAsString(registerDTO)))
-                .andExpect(status().isCreated());
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(registerDTO)))
+                        .andExpect(status().isCreated());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerDTO);
-
+        Mockito.verify(userServices, Mockito.times(1)).registerAsClient(registerDTO);
     }
 
     @Test
-    void registerClient_ThenThrowInvalidArgumentException_BecauseNameLengthIsInvalid () throws Exception {
+    void registerClient_ThenThrowInvalidArgumentException_BecauseNameLengthIsInvalid() throws Exception {
 
         RegisterDTO registerDTO = new RegisterDTO("", "athena@gmail.com",
                 "76323556855", "123456");
 
-        var mockUserServices = Mockito.mock(UserServices.class);
-
-        mockUserServices.registerAsClient(registerDTO);
+        Mockito.doThrow(new IllegalArgumentException("Invalid name"))
+                .when(userServices).registerAsClient(registerDTO);
 
         mockMvc.perform(post("/register/client")
                         .contentType("application/json")
                         .content(new ObjectMapper().writeValueAsString(registerDTO)))
                         .andExpect(status().isBadRequest());
-
-        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsClient(registerDTO);
-
     }
 
     @Test
-    void registerSeller_ThenReturnCREATED () throws Exception {
+    void registerSeller_ThenReturnCREATED() throws Exception {
+
+        RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
+                "76323556855", "123456");
+
+        Mockito.doNothing().when(userServices).registerAsSeller(registerDTO);
+
+        mockMvc.perform(post("/register/seller")
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(registerDTO)))
+                        .andExpect(status().isCreated());
+
+        Mockito.verify(userServices, Mockito.times(1)).registerAsSeller(registerDTO);
+    }
+
+    @Test
+    void registerSeller_ThenThrowInvalidArgumentException_BecauseNameLengthIsInvalid() throws Exception {
 
         RegisterDTO registerDTO = new RegisterDTO("", "athena@gmail.com",
                 "76323556855", "123456");
 
-        var mockUserServices = Mockito.mock(UserServices.class);
-
-        mockUserServices.registerAsSeller(registerDTO);
+        Mockito.doThrow(new IllegalArgumentException("Invalid name"))
+                .when(userServices).registerAsSeller(registerDTO);
 
         mockMvc.perform(post("/register/seller")
                         .contentType("application/json")
                         .content(new ObjectMapper().writeValueAsString(registerDTO)))
                         .andExpect(status().isBadRequest());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).registerAsSeller(registerDTO);
-
     }
 
     @Test
-    void login_ThenReturnOK_AndGenerateToken () throws Exception {
+    void login_ThenReturnOK_AndGenerateToken() throws Exception {
 
         LoginDTO loginDTO = new LoginDTO("athenas", "123456");
 
-        Mockito.when(userServices.login(loginDTO)).thenReturn(Mockito.any());
+        Mockito.when(userServices.login(loginDTO)).thenReturn("fake.jwt.token");
 
-         mockMvc.perform(post("/login")
-                 .content(new ObjectMapper().writeValueAsString(loginDTO))
-                 .contentType("application/json"))
-                 .andExpect(status().isOk());
+        mockMvc.perform(post("/login")
+                        .content(new ObjectMapper().writeValueAsString(loginDTO))
+                        .contentType("application/json"))
+                        .andExpect(status().isOk());
 
-         Mockito.verify(userServices, Mockito.times(1)).login(loginDTO);
-
+        Mockito.verify(userServices, Mockito.times(1)).login(loginDTO);
     }
 
     @Test
-    void reactivateAccount_ThenReturnNoContent () throws Exception {
+    void getProfileById_ThenReturnOK() throws Exception {
+
+        User mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setWallet(new Wallet(1L, BigDecimal.valueOf(500.0), mockUser));
+
+        Mockito.when(userServices.getProfileById(Mockito.any(), Mockito.eq(1L)))
+                .thenReturn(mockUser);
+
+        mockMvc.perform(get("/profile/{id}", 1L)
+                        .contentType("application/json"))
+                        .andExpect(status().isOk());
+
+        Mockito.verify(userServices, Mockito.times(1)).getProfileById(Mockito.any(), Mockito.eq(1L));
+    }
+
+    @Test
+    void reactivateAccount_ThenReturnNoContent() throws Exception {
 
         ReactivateUserDTO reactivateUserDTO = new ReactivateUserDTO("athena@gmail.com");
 
-        var mockUserServices = Mockito.mock(UserServices.class);
-
-        mockUserServices.reactivateUserAccount(reactivateUserDTO);
+        Mockito.doNothing().when(userServices).reactivateUserAccount(reactivateUserDTO);
 
         mockMvc.perform(put("/reactivate-account")
-                .contentType("application/json")
-                .content(new ObjectMapper().writeValueAsString(reactivateUserDTO)))
-                .andExpect(status().isNoContent());
+                        .contentType("application/json")
+                        .content(new ObjectMapper().writeValueAsString(reactivateUserDTO)))
+                        .andExpect(status().isNoContent());
 
-        Mockito.verify(mockUserServices, Mockito.times(1)).reactivateUserAccount(reactivateUserDTO);
-
+        Mockito.verify(userServices, Mockito.times(1)).reactivateUserAccount(reactivateUserDTO);
     }
 
     @Test
-    void deleteAccount_ThenReturnNoContent () throws Exception {
+    void deleteAccountById_ThenReturnNoContent() throws Exception {
 
-        var mockUserServices = Mockito.mock(UserServices.class);
+        Mockito.doNothing().when(userServices).disableUserAccount(HttpHeaders.EMPTY, 1L);
 
-        mockUserServices.disableUserAccount(HttpHeaders.EMPTY,1L);
+        userServices.disableUserAccount(HttpHeaders.EMPTY, 1L);
 
         mockMvc.perform(delete("/delete-account/{id}", 1L)
                         .contentType("application/json"))
                         .andExpect(status().isNoContent());
-
-        Mockito.verify(mockUserServices, Mockito.times(1)).disableUserAccount(HttpHeaders.EMPTY,1L);
-
     }
 
 

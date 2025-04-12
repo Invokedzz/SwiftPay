@@ -21,7 +21,8 @@ public class AuthService {
 
     private final TokenAuthService tokenAuthService;
 
-    public AuthService (AuthenticationManager authenticationManager, TokenAuthService tokenAuthService) {
+    public AuthService (AuthenticationManager authenticationManager,
+                        TokenAuthService tokenAuthService) {
 
         this.authenticationManager = authenticationManager;
 

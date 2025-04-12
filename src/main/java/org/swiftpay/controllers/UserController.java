@@ -58,6 +58,15 @@ public record UserController (UserServices userServices) {
 
     }
 
+    @GetMapping("/profile/{id}")
+    private ResponseEntity <AccountDTO> userProfile (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+
+        var users = userServices.getProfileById(headers, id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new AccountDTO(users));
+
+    }
+
     @PutMapping("/reactivate-account")
     private ResponseEntity <Void> reactivateUser (@RequestBody ReactivateUserDTO reactivateUserDTO) {
 

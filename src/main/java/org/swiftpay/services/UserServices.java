@@ -126,7 +126,7 @@ public class UserServices {
     }
 
     @Transactional
-    public void disableUserAccount (HttpHeaders headers, Long id) {
+    public void disableUserAccount(HttpHeaders headers, Long id) {
 
         var searchForAccount = userRepository.findById(id)
                                              .orElse(null);
@@ -146,6 +146,23 @@ public class UserServices {
             mailService.setupDeletionEmailLogic(searchForAccount.getEmail());
 
             return;
+
+        }
+
+        throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
+
+    }
+
+    public User getProfileById (HttpHeaders headers, Long id) {
+
+        var searchForAccount = userRepository.findById(id)
+                                             .orElse(null);
+
+        if (searchForAccount != null) {
+
+            authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
+
+            return searchForAccount;
 
         }
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,7 +20,6 @@ import org.swiftpay.repositories.UserRepository;
 
 import java.time.LocalDate;
 import java.util.Optional;
-
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -103,6 +103,27 @@ class UserServicesTest {
     }
 
     @Test
+    void getProfileById_ThenReturnUser () {
+
+        Long userId = 1L;
+        User fakeUser = new User();
+        HttpHeaders headers = new HttpHeaders();
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(fakeUser));
+
+        Mockito.doNothing().when(authService).compareIdFromTheSessionWithTheIdInTheUrl(headers, userId);
+
+        userRepository.findById(userId);
+
+        authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, userId);
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+
+        Mockito.verify(authService, Mockito.times(1)).compareIdFromTheSessionWithTheIdInTheUrl(headers, userId);
+
+    }
+
+    @Test
     void reactivateAccount_ThenReturn () {
 
         ReactivateUserDTO reactivateUserDTO = new ReactivateUserDTO("Apollo@gmail.com");
@@ -136,7 +157,7 @@ class UserServicesTest {
     }
 
     @Test
-    void disableAccount_ThenReturn () {
+    void disableAccountById_ThenReturn () {
 
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
 

@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
 import org.swiftpay.repositories.TransferRepository;
 import org.swiftpay.repositories.UserRepository;
 
@@ -17,27 +19,27 @@ public class TransferService {
 
     private final UserRepository userRepository;
 
-    private final AuthorizationService authorizationService;
+    private final TransferAuthorizationPolicy transferAuthorizationPolicy;
 
     private final TransferRepository transferRepository;
 
     public TransferService (RestTemplate restTemplate,
                             UserRepository userRepository,
-                            AuthorizationService authorizationService,
+                            TransferAuthorizationPolicy transferAuthorizationPolicy,
                             TransferRepository transferRepository) {
 
         this.restTemplate = restTemplate;
 
         this.userRepository = userRepository;
 
-        this.authorizationService = authorizationService;
+        this.transferAuthorizationPolicy = transferAuthorizationPolicy;
 
         this.transferRepository = transferRepository;
 
     }
 
     @Transactional
-    public void transferToSomeone () {
+    public void transferToSomeone (TransferDTO transferDTO) {
 
     }
 

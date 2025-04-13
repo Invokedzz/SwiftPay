@@ -39,7 +39,7 @@ public class RolesService {
 
     }
 
-    public User validateClientPropertiesBeforeRegister(RegisterDTO registerDTO) {
+    public User validateClientPropertiesBeforeRegister (RegisterDTO registerDTO) {
 
         User user = new User(registerDTO);
 

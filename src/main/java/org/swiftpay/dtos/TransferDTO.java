@@ -4,4 +4,4 @@ import org.swiftpay.model.User;
 
 import java.math.BigDecimal;
 
-public record TransferDTO (BigDecimal amount, Long payerId, Long payeeId) {}
+public record TransferDTO (BigDecimal value, Long payerId, Long payeeId) {}

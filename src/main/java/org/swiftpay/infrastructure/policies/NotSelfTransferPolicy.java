@@ -1,8 +1,10 @@
 package org.swiftpay.infrastructure.policies;
 
+import org.springframework.stereotype.Component;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.exceptions.SelfTransferException;
 
+@Component
 public class NotSelfTransferPolicy implements TransferPolicy {
 
     @Override

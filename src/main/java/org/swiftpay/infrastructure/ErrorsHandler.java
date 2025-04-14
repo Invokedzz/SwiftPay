@@ -59,16 +59,14 @@ public class ErrorsHandler {
     @ExceptionHandler({
 
             InvalidStateException.class,
-
             BadRequestException.class,
-
             NonActiveUserException.class,
-
             AlreadyActiveException.class,
-
             InvalidCPFException.class,
-
-            InvalidCNPJException.class
+            InvalidCNPJException.class,
+            SelfTransferException.class,
+            InvalidAmountException.class,
+            InvalidTypeOfPayerException.class,
 
     })
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {

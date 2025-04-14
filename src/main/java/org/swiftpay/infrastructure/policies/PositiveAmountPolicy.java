@@ -12,9 +12,9 @@ public class PositiveAmountPolicy implements TransferPolicy {
     @Override
     public void validate (TransferDTO transferDTO) {
 
-        if (transferDTO.amount().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transferDTO.value().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new InvalidAmountException("Invalid amount: " + transferDTO.amount());
+            throw new InvalidAmountException("Invalid amount: " + transferDTO.value());
 
         }
 

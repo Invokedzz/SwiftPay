@@ -1,6 +1,7 @@
 package org.swiftpay.services;
 
 import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,20 +16,12 @@ import org.swiftpay.model.User;
 import java.text.ParseException;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
     private final TokenAuthService tokenAuthService;
-
-    public AuthService (AuthenticationManager authenticationManager,
-                        TokenAuthService tokenAuthService) {
-
-        this.authenticationManager = authenticationManager;
-
-        this.tokenAuthService = tokenAuthService;
-
-    }
 
     public String validateLoginPropertiesThenGenerateToken (LoginDTO loginDTO) {
 

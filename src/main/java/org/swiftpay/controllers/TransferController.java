@@ -12,12 +12,12 @@ import org.swiftpay.services.TransferService;
 @RequestMapping("/transfer")
 public record TransferController (TransferService transferService) {
 
-    @PostMapping
-    private ResponseEntity <Void> transfer (@RequestBody TransferDTO transferDTO) {
+    @PostMapping("/sandbox")
+    private ResponseEntity <Void> transferSandboxVer (@RequestBody TransferDTO transferDTO) {
 
-        transferService.transferToSomeone(transferDTO);
+        transferService.transferToSomeoneSandbox(transferDTO);
 
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.accepted().build();
 
     }
 

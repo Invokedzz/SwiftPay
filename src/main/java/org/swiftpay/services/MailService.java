@@ -2,6 +2,7 @@ package org.swiftpay.services;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.hashids.Hashids;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,15 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class MailService {
 
     private final JavaMailSender mailSender;
-
-    public MailService (JavaMailSender mailSender) {
-
-        this.mailSender = mailSender;
-
-    }
 
     public void setupConfirmationEmailLogic (User user) {
 

@@ -1,6 +1,7 @@
 package org.swiftpay.services;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServices {
 
     /*
@@ -42,24 +44,6 @@ public class UserServices {
     private final AuthService authService;
 
     private final MailService mailService;
-
-    public UserServices (UserRepository userRepository,
-                         DeleteRegisterRepository deleteRegisterRepository,
-                         RolesService rolesService,
-                         AuthService authService,
-                         MailService mailService) {
-
-        this.userRepository = userRepository;
-
-        this.deleteRegisterRepository = deleteRegisterRepository;
-
-        this.rolesService = rolesService;
-
-        this.authService = authService;
-
-        this.mailService = mailService;
-
-    }
 
     @Transactional
     public void registerAsClient (RegisterDTO registerDTO) {

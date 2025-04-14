@@ -4,13 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
-import org.swiftpay.infrastructure.clients.NotificationClient;
-import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
+import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
 import org.swiftpay.repositories.UserRepository;
@@ -25,22 +23,25 @@ public class TransferService {
 
     private final UserRepository userRepository;
 
-    private final TransferAuthorizationPolicy transferAuthorizationPolicy;
-
     private final TransferRepository transferRepository;
 
     private final WalletRepository walletRepository;
 
     private final NotificationService notificationService;
 
-    @Transactional
-    public void transferToSomeone (TransferDTO transferDTO) {
+    private final AuthorizationService authorizationService;
 
-        var payer = userRepository.findById(transferDTO.payerId()).orElseThrow();
+    @Transactional
+    public void transferToSomeoneSandbox (TransferDTO transferDTO) {
+
+        var payer = userRepository.findById(transferDTO.payerId())
+                                  .orElseThrow(() -> new UserNotFoundException("Payer id not found!"));
 
         validateUserRolesBeforeTransfer(payer);
 
-        transferAuthorizationPolicy.authorize(transferDTO);
+        authorizationService.validateTransferBody(transferDTO);
+
+        validateTransference();
 
         sendNotificationAfterTransfer();
 
@@ -49,6 +50,16 @@ public class TransferService {
     private void sendNotificationAfterTransfer () {
 
         notificationService.sendNotification();
+
+    }
+
+    private void validateTransference () {
+
+        if (!authorizationService.validateTransfer()) {
+
+            throw new APIErrorException("The API is not accepting transfers right now. Please, try again sometime.");
+
+        }
 
     }
 

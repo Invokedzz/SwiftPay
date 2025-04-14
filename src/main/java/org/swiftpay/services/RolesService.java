@@ -2,6 +2,7 @@ package org.swiftpay.services;
 
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.RegisterDTO;
@@ -14,6 +15,7 @@ import org.swiftpay.repositories.RoleRepository;
 import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class RolesService {
 
     private final RoleRepository roleRepository;
@@ -23,21 +25,6 @@ public class RolesService {
     private final CNPJValidator cnpjValidator;
 
     private final PasswordEncoder passwordEncoder;
-
-    public RolesService (RoleRepository roleRepository,
-                         CPFValidator cpfValidator,
-                         CNPJValidator cnpjValidator,
-                         PasswordEncoder passwordEncoder) {
-
-        this.roleRepository = roleRepository;
-
-        this.cpfValidator = cpfValidator;
-
-        this.cnpjValidator = cnpjValidator;
-
-        this.passwordEncoder = passwordEncoder;
-
-    }
 
     public User validateClientPropertiesBeforeRegister (RegisterDTO registerDTO) {
 

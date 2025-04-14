@@ -2,7 +2,9 @@ package org.swiftpay.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.infrastructure.clients.AuthorizationClient;
 import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
 
@@ -16,10 +18,7 @@ public class AuthorizationService {
 
     public boolean validateTransfer () {
 
-        return authorizationClient.validateTransference()
-                                  .data()
-                                  .authorization()
-                                  .equals("true");
+        return authorizationClient.validateTransference().data().authorization();
 
     }
 

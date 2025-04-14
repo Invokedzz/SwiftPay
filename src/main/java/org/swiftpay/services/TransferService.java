@@ -7,12 +7,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.exceptions.APIErrorException;
+import org.swiftpay.exceptions.InvalidAmountException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
 import org.swiftpay.exceptions.UserNotFoundException;
+import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
 import org.swiftpay.repositories.UserRepository;
 import org.swiftpay.repositories.WalletRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -37,13 +42,40 @@ public class TransferService {
         var payer = userRepository.findById(transferDTO.payerId())
                                   .orElseThrow(() -> new UserNotFoundException("Payer id not found!"));
 
+        var payee = userRepository.findById(transferDTO.payeeId())
+                                  .orElseThrow(() -> new UserNotFoundException("Payee id not found!"));
+
         validateUserRolesBeforeTransfer(payer);
 
         authorizationService.validateTransferBody(transferDTO);
 
+        validateValueThatIsGoingToBeTransferred(payer.getWallet().getBalance(), transferDTO.value());
+
+        transference(payer, payee, transferDTO.value());
+
         validateTransference();
 
+        saveTransference(transferDTO, payer, payee);
+
         sendNotificationAfterTransfer();
+
+    }
+
+    private void transference (User payer, User payee, BigDecimal value) {
+
+        payer.getWallet().setBalance(payer.getWallet().getBalance().subtract(value));
+
+        payee.getWallet().setBalance(payee.getWallet().getBalance().add(value));
+
+        walletRepository.save(payer.getWallet());
+
+        walletRepository.save(payee.getWallet());
+
+    }
+
+    private void saveTransference (TransferDTO transferDTO, User payer, User payee) {
+
+        transferRepository.save(new Transfer(transferDTO, LocalDate.now(), payer, payee));
 
     }
 
@@ -58,6 +90,16 @@ public class TransferService {
         if (!authorizationService.validateTransfer()) {
 
             throw new APIErrorException("The API is not accepting transfers right now. Please, try again sometime.");
+
+        }
+
+    }
+
+    private void validateValueThatIsGoingToBeTransferred (BigDecimal balance, BigDecimal value) {
+
+        if (value.compareTo(balance) > 0) {
+
+            throw new InvalidAmountException("The value must be lower than or equal to " + balance);
 
         }
 

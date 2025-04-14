@@ -119,4 +119,19 @@ public class ErrorsHandler {
 
     }
 
+    @ExceptionHandler(APIErrorException.class)
+    public ResponseEntity <ErrorDTO> handleServiceUnavailable (APIErrorException ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.GATEWAY_TIMEOUT.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.GATEWAY_TIMEOUT);
+
+    }
+
 }

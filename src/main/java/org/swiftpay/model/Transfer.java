@@ -32,4 +32,16 @@ public class Transfer {
     @JoinColumn(name = "payee_id")
     private User payee;
 
+    public Transfer (TransferDTO transferDTO, LocalDate transferDate, User payer, User payee) {
+
+        this.value = transferDTO.value();
+
+        this.transferDate = transferDate;
+
+        this.payer = payer;
+
+        this.payee = payee;
+
+    }
+
 }

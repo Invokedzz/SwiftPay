@@ -8,6 +8,8 @@ import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.infrastructure.clients.AuthorizationClient;
 import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
@@ -25,6 +27,12 @@ public class AuthorizationService {
     public void validateTransferBody (TransferDTO transferDTO) {
 
         transferAuthorizationPolicy.authorize(transferDTO);
+
+    }
+
+    public void compareValueAndBalance (BigDecimal balance, BigDecimal value) {
+
+        transferAuthorizationPolicy.validateValueThatIsGoingToBeTransferred(balance, value);
 
     }
 

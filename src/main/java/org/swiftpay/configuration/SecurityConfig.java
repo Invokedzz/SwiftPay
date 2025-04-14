@@ -20,6 +20,21 @@ public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
 
+    private static final String[] AUTH_WHITELIST = {
+            // -- Swagger UI v2
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            // -- Swagger UI v3 (OpenAPI)
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+            // other public endpoints of your API may be appended to this array
+    };
+
     public SecurityConfig (SecurityFilter securityFilter) {
 
         this.securityFilter = securityFilter;
@@ -33,6 +48,7 @@ public class SecurityConfig {
                 .sessionManagement(custom -> custom.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account", "/reactivate-account", "/all").permitAll())
                 .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/profile/{id}", "/transfer/sandbox").hasAnyRole("CLIENT", "SELLER"))
+                .authorizeHttpRequests(req -> req.requestMatchers(AUTH_WHITELIST).permitAll())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -2,12 +2,10 @@ package org.swiftpay.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.exceptions.APIErrorException;
-import org.swiftpay.exceptions.InvalidAmountException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
 import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.Transfer;
@@ -22,9 +20,6 @@ import java.time.LocalDate;
 @Service
 @RequiredArgsConstructor
 public class TransferService {
-
-    @Value("${asaas.api.key}")
-    private String asaasKey;
 
     private final UserRepository userRepository;
 
@@ -49,7 +44,7 @@ public class TransferService {
 
         authorizationService.validateTransferBody(transferDTO);
 
-        validateValueThatIsGoingToBeTransferred(payer.getWallet().getBalance(), transferDTO.value());
+        authorizationService.compareValueAndBalance(payer.getWallet().getBalance(), transferDTO.value());
 
         transference(payer, payee, transferDTO.value());
 
@@ -90,16 +85,6 @@ public class TransferService {
         if (!authorizationService.validateTransfer()) {
 
             throw new APIErrorException("The API is not accepting transfers right now. Please, try again sometime.");
-
-        }
-
-    }
-
-    private void validateValueThatIsGoingToBeTransferred (BigDecimal balance, BigDecimal value) {
-
-        if (value.compareTo(balance) > 0) {
-
-            throw new InvalidAmountException("The value must be lower than or equal to " + balance);
 
         }
 

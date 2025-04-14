@@ -15,8 +15,6 @@ import org.swiftpay.repositories.UserRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,14 +75,6 @@ public class UserServices {
 
     }
 
-    public Set <ViewAllUsersDTO> getUsers () {
-
-        return userRepository.findAllByActive(true).stream()
-                .map(ViewAllUsersDTO::new)
-                .collect(Collectors.toSet());
-
-    }
-
     @Transactional
     public void reactivateUserAccount (ReactivateUserDTO reactivateUserDTO) {
 
@@ -134,6 +124,12 @@ public class UserServices {
         }
 
         throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
+
+    }
+
+    public User findUserById (Long id) {
+
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
 
     }
 

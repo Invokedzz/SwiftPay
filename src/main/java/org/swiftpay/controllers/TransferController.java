@@ -16,6 +16,8 @@ public record TransferController (TransferService transferService) {
     @PostMapping
     private ResponseEntity <Void> transfer (@Valid @RequestBody TransferDTO transferDTO) {
 
+        transferService.transferToSomeone(transferDTO);
+
         return ResponseEntity.ok().body(null);
 
     }

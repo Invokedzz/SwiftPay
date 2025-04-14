@@ -11,8 +11,6 @@ import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
-import org.swiftpay.repositories.UserRepository;
-import org.swiftpay.repositories.WalletRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,24 +19,25 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class TransferService {
 
-    private final UserRepository userRepository;
+    private final UserServices userServices;
 
     private final TransferRepository transferRepository;
 
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
 
     private final NotificationService notificationService;
 
     private final AuthorizationService authorizationService;
 
     @Transactional
+    public void transferToSomeone (TransferDTO transferDTO) {}
+
+    @Transactional
     public void transferToSomeoneSandbox (TransferDTO transferDTO) {
 
-        var payer = userRepository.findById(transferDTO.payerId())
-                                  .orElseThrow(() -> new UserNotFoundException("Payer id not found!"));
+        var payer = userServices.findUserById(transferDTO.payerId());
 
-        var payee = userRepository.findById(transferDTO.payeeId())
-                                  .orElseThrow(() -> new UserNotFoundException("Payee id not found!"));
+        var payee = userServices.findUserById(transferDTO.payeeId());
 
         validateUserRolesBeforeTransfer(payer);
 
@@ -62,9 +61,9 @@ public class TransferService {
 
         payee.getWallet().setBalance(payee.getWallet().getBalance().add(value));
 
-        walletRepository.save(payer.getWallet());
+        walletService.save(payer.getWallet());
 
-        walletRepository.save(payee.getWallet());
+        walletService.save(payee.getWallet());
 
     }
 

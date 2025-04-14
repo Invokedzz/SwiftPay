@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.swiftpay.dtos.*;
 import org.swiftpay.services.UserServices;
 
-import java.util.Set;
-
 @RestController
 public record UserController (UserServices userServices) {
 
@@ -46,15 +44,6 @@ public record UserController (UserServices userServices) {
         var generatedToken = userServices.login(loginDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(new UserTokenDTO(generatedToken));
-
-    }
-
-    @GetMapping("/all")
-    private ResponseEntity <Set<ViewAllUsersDTO>> getAllUsers () {
-
-        var users = userServices.getUsers();
-
-        return ResponseEntity.status(HttpStatus.OK).body(users);
 
     }
 

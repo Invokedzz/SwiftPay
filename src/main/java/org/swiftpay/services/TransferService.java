@@ -2,6 +2,7 @@ package org.swiftpay.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
@@ -28,15 +29,19 @@ public class TransferService {
 
     private final AuthorizationService authorizationService;
 
+    private final AuthService authService;
+
     @Transactional
     public void transferToSomeone (TransferDTO transferDTO) {}
 
     @Transactional
-    public void transferToSomeoneSandbox (TransferDTO transferDTO) {
+    public void transferToSomeoneSandbox (HttpHeaders headers, TransferDTO transferDTO) {
 
         var payer = userServices.findUserById(transferDTO.payerId());
 
         var payee = userServices.findUserById(transferDTO.payeeId());
+
+        authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, payer.getId());
 
         validateUserRolesBeforeTransfer(payer);
 

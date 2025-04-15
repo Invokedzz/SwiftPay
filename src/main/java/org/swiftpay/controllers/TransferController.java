@@ -4,17 +4,17 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.services.TransferService;
 
 @RestController
 @RequestMapping("/transfer")
+@Tag(name = "Transfer", description = "Endpoints related to transfer. Sandbox ver.")
 public record TransferController (TransferService transferService) {
 
     @Hidden
@@ -48,9 +48,10 @@ public record TransferController (TransferService transferService) {
             )
 
     })
-    private ResponseEntity <Void> transferSandboxVer (@Valid @RequestBody TransferDTO transferDTO) {
 
-        transferService.transferToSomeoneSandbox(transferDTO);
+    private ResponseEntity <Void> transferSandboxVer (@RequestHeader HttpHeaders headers, @Valid @RequestBody TransferDTO transferDTO) {
+
+        transferService.transferToSomeoneSandbox(headers, transferDTO);
 
         return ResponseEntity.accepted().build();
 

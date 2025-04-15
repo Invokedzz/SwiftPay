@@ -1,6 +1,8 @@
 package org.swiftpay.controllers;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,7 +18,26 @@ import org.swiftpay.services.UserServices;
 public record UserController (UserServices userServices) {
 
     @PostMapping("/register/client")
-    @Operation(description = "Register as a client. A client is able to receive money, and transfer")
+    @Operation(description = "Register as a client. A client is able to receive money, and transfer", responses = {
+
+            @ApiResponse(
+
+                    description = "Created",
+
+                    responseCode = "201"
+
+            ),
+
+            @ApiResponse(
+
+                    description = "Bad Request",
+
+                    responseCode = "400"
+
+            )
+
+    })
+
     private ResponseEntity <Void> clientRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
         userServices.registerAsClient(registerDTO);
@@ -26,7 +47,26 @@ public record UserController (UserServices userServices) {
     }
 
     @PostMapping("/register/seller")
-    @Operation(description = "Register as a seller. A seller is able to receive money, and that's it")
+    @Operation(description = "Register as a seller. A seller is able to receive money, and that's it", responses = {
+
+            @ApiResponse(
+
+                    description = "Created",
+
+                    responseCode = "201"
+
+            ),
+
+            @ApiResponse(
+
+                    description = "Bad Request",
+
+                    responseCode = "400"
+
+            )
+
+    })
+
     private ResponseEntity <Void> sellerRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
         userServices.registerAsSeller(registerDTO);
@@ -46,7 +86,27 @@ public record UserController (UserServices userServices) {
     }
 
     @PostMapping("/login")
-    @Operation(description = "After activating your account, do a login. If the request is successful, you're going to receive a JWT. Use it to access other endpoints")
+    @Operation(description = "After activating your account, do a login. If the request is successful," +
+               " you're going to receive a JWT. Use it to access other endpoints", responses = {
+
+            @ApiResponse(
+
+                    description = "Ok",
+
+                    responseCode = "200"
+
+            ),
+
+            @ApiResponse(
+
+                    description = "Bad Request",
+
+                    responseCode = "400"
+
+            )
+
+    })
+
     private ResponseEntity <UserTokenDTO> login (@Valid @RequestBody LoginDTO loginDTO) {
 
         var generatedToken = userServices.login(loginDTO);
@@ -57,7 +117,27 @@ public record UserController (UserServices userServices) {
 
     @GetMapping("/profile/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(description = "Endpoint to access your profile, after your account is created")
+    @Operation(description = "Endpoint to access your profile, after your account is created", responses = {
+
+            @ApiResponse(
+
+                    description = "Ok",
+
+                    responseCode = "200"
+
+            ),
+
+            @ApiResponse(
+
+                    description = "Not Found",
+
+                    responseCode = "404"
+
+            )
+
+    })
+
+    @SecurityRequirement(name = "bearerAuth")
     private ResponseEntity <AccountDTO> userProfile (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
 
         var users = userServices.getProfileById(headers, id);
@@ -66,8 +146,8 @@ public record UserController (UserServices userServices) {
 
     }
 
+    @Hidden
     @PutMapping("/reactivate-account")
-    @Operation(description = "If you want to reactivate your account, then use this endpoint. You're only able to do so if your account is not activated")
     private ResponseEntity <Void> reactivateUser (@RequestBody ReactivateUserDTO reactivateUserDTO) {
 
         userServices.reactivateUserAccount(reactivateUserDTO);
@@ -76,9 +156,8 @@ public record UserController (UserServices userServices) {
 
     }
 
+    @Hidden
     @DeleteMapping("/delete-account/{id}")
-    @SecurityRequirement(name = "bearerAuth")
-    @Operation(description = "Endpoint to delete your account from the system. After the request, you're going to receive an email confirming the deletion")
     private ResponseEntity <Void> disableUser (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
 
         userServices.disableUserAccount(headers, id);

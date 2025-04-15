@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
-import org.swiftpay.exceptions.UserNotFoundException;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;

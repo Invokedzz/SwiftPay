@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.swiftpay.dtos.PaymentRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.services.TransferService;
 
@@ -24,6 +25,16 @@ public record TransferController (TransferService transferService) {
         transferService.transferToSomeone(transferDTO);
 
         return ResponseEntity.ok().body(null);
+
+    }
+
+    @Hidden
+    @PostMapping("/sandbox/test")
+    private ResponseEntity <?> sandboxTest (@Valid @RequestBody PaymentRequestDTO paymentRequestDTO) {
+
+        var test = transferService.requestPayment(paymentRequestDTO);
+
+        return ResponseEntity.ok().body(test);
 
     }
 

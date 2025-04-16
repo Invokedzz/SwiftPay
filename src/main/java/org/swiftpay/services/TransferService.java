@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.swiftpay.dtos.PaymentRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferResponseDTO;
 import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
 import org.swiftpay.model.Transfer;
@@ -29,10 +31,18 @@ public class TransferService {
 
     private final AuthorizationService authorizationService;
 
+    private final AsaasService pixService;
+
     private final AuthService authService;
 
     @Transactional
     public void transferToSomeone (TransferDTO transferDTO) {}
+
+    public TransferResponseDTO requestPayment (PaymentRequestDTO paymentRequestDTO) {
+
+        return pixService.createPayment(paymentRequestDTO);
+
+    }
 
     @Transactional
     public void transferToSomeoneSandbox (HttpHeaders headers, TransferDTO transferDTO) {

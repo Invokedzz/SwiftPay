@@ -1,5 +1,6 @@
 package org.swiftpay.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.swiftpay.infrastructure.SecurityFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
@@ -35,19 +37,13 @@ public class SecurityConfig {
             // other public endpoints of your API may be appended to this array
     };
 
-    public SecurityConfig (SecurityFilter securityFilter) {
-
-        this.securityFilter = securityFilter;
-
-    }
-
     @Bean
     SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(custom -> custom.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account", "/reactivate-account", "/all").permitAll())
-                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/profile/{id}", "/transfer/sandbox").hasAnyRole("CLIENT", "SELLER"))
+                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/profile/{id}", "/transfer/sandbox", "/transfer/sandbox/test").hasAnyRole("CLIENT", "SELLER"))
                 .authorizeHttpRequests(req -> req.requestMatchers(AUTH_WHITELIST).permitAll())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 

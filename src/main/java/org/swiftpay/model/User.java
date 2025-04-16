@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List <Role> roles;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Asaas asaas;
+
     public User (RegisterDTO registerUserDTO) {
 
         this.username = registerUserDTO.username();

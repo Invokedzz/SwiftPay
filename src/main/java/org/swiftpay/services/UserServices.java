@@ -43,6 +43,8 @@ public class UserServices {
 
     private final MailService mailService;
 
+    private final AsaasService asaasService;
+
     @Transactional
     public void registerAsClient (RegisterDTO registerDTO) {
 

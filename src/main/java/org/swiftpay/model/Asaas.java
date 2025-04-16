@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.swiftpay.dtos.SaveAsaasCustomerDTO;
 
 @Data
 @Entity
@@ -24,5 +25,13 @@ public class Asaas {
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Asaas (SaveAsaasCustomerDTO saveAsaasCustomerDTO) {
+
+        this.asaasId = saveAsaasCustomerDTO.asaasId();
+
+        this.user = saveAsaasCustomerDTO.user();
+
+    }
 
 }

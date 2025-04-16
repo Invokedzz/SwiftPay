@@ -46,15 +46,25 @@ public class UserServices {
     private final AsaasService asaasService;
 
     @Transactional
-    public void registerAsClient (RegisterDTO registerDTO) {
+    public CustomerResponseDTO registerAsClient (RegisterDTO registerDTO) {
 
         var validatedClient = rolesService.validateClientPropertiesBeforeRegister(registerDTO);
 
         userRepository.save(validatedClient);
 
+        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(
+
+                new CustomerRequestDTO(validatedClient.getUsername(), validatedClient.getEmail(), validatedClient.getCpfCnpj())
+
+        );
+
+        asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedClient));
+
         rolesService.setupUserRolesAndSave(validatedClient);
 
         mailService.setupConfirmationEmailLogic(validatedClient);
+
+        return customerResponseDTO;
 
     }
 

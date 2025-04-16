@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.swiftpay.dtos.CustomerRequestDTO;
 import org.swiftpay.dtos.RegisterDTO;
 
 import java.util.Collection;
@@ -59,6 +60,16 @@ public class User implements UserDetails {
         this.password = registerUserDTO.password();
 
         this.active = false;
+
+    }
+
+    public User (CustomerRequestDTO customerRequestDTO) {
+
+        this.username = customerRequestDTO.name();
+
+        this.email = customerRequestDTO.email();
+
+        this.cpfCnpj = customerRequestDTO.cpfCnpj();
 
     }
 

@@ -20,6 +20,8 @@ public class Wallet {
 
     private BigDecimal balance;
 
+    private String asaasWalletId;
+
     @OneToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")

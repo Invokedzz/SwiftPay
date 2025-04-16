@@ -1,10 +1,9 @@
 package org.swiftpay.services;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
-import org.swiftpay.infrastructure.clients.AsaasClient;
+import org.swiftpay.infrastructure.clients.AsaasAccountsClient;
 import org.swiftpay.model.Asaas;
 import org.swiftpay.repositories.AsaasRepository;
 
@@ -12,26 +11,19 @@ import org.swiftpay.repositories.AsaasRepository;
 @RequiredArgsConstructor
 public class AsaasService {
 
-    private final AsaasClient asaasClient;
+    private final AsaasAccountsClient customerClient;
 
     private final AsaasRepository asaasRepository;
 
     public CustomerResponseDTO registerCustomerInAsaas (CustomerRequestDTO customerRequestDTO) {
 
-        return asaasClient.createCustomer(customerRequestDTO);
+        return customerClient.createCustomer(customerRequestDTO);
 
     }
 
     public void saveCustomerInTheDB (SaveAsaasCustomerDTO saveAsaasCustomerDTO) {
 
         asaasRepository.save(new Asaas(saveAsaasCustomerDTO));
-
-    }
-
-    @Transactional
-    public TransferResponseDTO createPayment (PaymentRequestDTO paymentRequestDTO) {
-
-        return asaasClient.createPayment(paymentRequestDTO);
 
     }
 

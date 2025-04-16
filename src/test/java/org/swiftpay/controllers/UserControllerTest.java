@@ -120,7 +120,7 @@ class UserControllerTest {
 
         User mockUser = new User();
         mockUser.setId(1L);
-        mockUser.setWallet(new Wallet(1L, BigDecimal.valueOf(500.0), mockUser));
+   //     mockUser.setWallet(new Wallet(1L, BigDecimal.valueOf(500.0), mockUser));
 
         Mockito.when(userServices.getProfileById(Mockito.any(), Mockito.eq(1L)))
                 .thenReturn(mockUser);

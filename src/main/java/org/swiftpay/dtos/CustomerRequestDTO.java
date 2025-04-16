@@ -1,3 +1,6 @@
 package org.swiftpay.dtos;
 
-public record CustomerRequestDTO (String name, String email, String cpfCnpj) {}
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record CustomerRequestDTO (String name, String email, String cpfCnpj, LocalDate birthDate, BigDecimal incomeValue, String postalCode) {}

@@ -4,15 +4,13 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.swiftpay.configuration.AsaasConfig;
-import org.swiftpay.dtos.*;
+import org.swiftpay.dtos.CustomerRequestDTO;
+import org.swiftpay.dtos.CustomerResponseDTO;
 
-@FeignClient(url = "${asaas.url}", name= "AsaasClient", configuration = AsaasConfig.class)
-public interface AsaasClient {
+@FeignClient(url = "${asaas.url}/accounts", name= "AsaasCustomerClient", configuration = AsaasConfig.class)
+public interface AsaasAccountsClient {
 
-    @PostMapping("/customers")
+    @PostMapping
     CustomerResponseDTO createCustomer (@RequestBody CustomerRequestDTO customerRequestDTO);
-
-    @PostMapping("/payments")
-    TransferResponseDTO createPayment (@RequestBody PaymentRequestDTO paymentRequestDTO);
 
 }

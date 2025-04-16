@@ -28,16 +28,6 @@ public record TransferController (TransferService transferService) {
 
     }
 
-    @Hidden
-    @PostMapping("/sandbox/test")
-    private ResponseEntity <?> sandboxTest (@Valid @RequestBody PaymentRequestDTO paymentRequestDTO) {
-
-        var test = transferService.requestPayment(paymentRequestDTO);
-
-        return ResponseEntity.ok().body(test);
-
-    }
-
     @PostMapping("/sandbox")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(description = "Have fun using the sandbox. Make transfers, and enjoy", responses = {

@@ -40,9 +40,9 @@ public record UserController (UserServices userServices) {
 
     private ResponseEntity <CustomerResponseDTO> clientRegister (@Valid @RequestBody RegisterDTO registerDTO) {
 
-        var response = userServices.registerAsClient(registerDTO);
+        var user = userServices.registerAsClient(registerDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
 
     }
 

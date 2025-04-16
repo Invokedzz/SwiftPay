@@ -13,6 +13,7 @@ import org.swiftpay.model.User;
 import org.swiftpay.repositories.DeleteRegisterRepository;
 import org.swiftpay.repositories.UserRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -54,7 +55,12 @@ public class UserServices {
 
         CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(
 
-                new CustomerRequestDTO(validatedClient.getUsername(), validatedClient.getEmail(), validatedClient.getCpfCnpj())
+                new CustomerRequestDTO(validatedClient.getUsername(),
+                                        validatedClient.getEmail(),
+                                        validatedClient.getCpfCnpj(),
+                                        LocalDate.parse("2004-10-02"),
+                                        BigDecimal.valueOf(2400),
+                                    "05351000")
 
         );
 
@@ -75,6 +81,19 @@ public class UserServices {
 
         userRepository.save(validatedSeller);
 
+        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(
+
+                new CustomerRequestDTO(validatedSeller.getUsername(),
+                                       validatedSeller.getEmail(),
+                                       validatedSeller.getCpfCnpj(),
+                                       LocalDate.parse("2004-10-02"),
+                                       BigDecimal.valueOf(1200),
+                                "Sao Paulo - SP")
+
+        );
+
+        asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedSeller));
+
         rolesService.setupUserRolesAndSave(validatedSeller);
 
         mailService.setupConfirmationEmailLogic(validatedSeller);
@@ -90,75 +109,58 @@ public class UserServices {
     @Transactional
     public void reactivateUserAccount (ReactivateUserDTO reactivateUserDTO) {
 
-        var searchForAccount = userRepository.findByEmail(reactivateUserDTO.email())
-                                            .orElse(null);
+        var searchForAccount = userRepository
+                                .findByEmail(reactivateUserDTO.email())
+                                .orElseThrow(() -> new UserNotFoundException("We were not able to find an account with that email!"));
 
-        if (searchForAccount != null) {
+        authService.checkIfUserIsAlreadyActive(searchForAccount.getActive());
 
-            authService.checkIfUserIsAlreadyActive(searchForAccount.getActive());
+        searchForAccount.activate();
 
-            searchForAccount.activate();
+        userRepository.save(searchForAccount);
 
-            userRepository.save(searchForAccount);
-
-            deleteRegisterRepository.deleteByUser_Id(searchForAccount.getId());
-
-            return;
-
-        }
-
-        throw new UserNotFoundException("We were not able to find an account with that email");
+        deleteRegisterRepository.deleteByUser_Id(searchForAccount.getId());
 
     }
 
     @Transactional
-    public void disableUserAccount(HttpHeaders headers, Long id) {
+    public void disableUserAccount (HttpHeaders headers, Long id) {
 
-        var searchForAccount = userRepository.findById(id)
-                                             .orElse(null);
+        var searchForAccount = userRepository
+                                .findById(id)
+                                .orElseThrow(() -> new UserNotFoundException("We weren't able to find a user with this id: " + id));
 
-        if (searchForAccount != null) {
+        authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
 
-            authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
+        searchForAccount.deactivate();
 
-            searchForAccount.deactivate();
+        var addUserToRegister = setupDeletionRegister(searchForAccount);
 
-            var addUserToRegister = setupDeletionRegister(searchForAccount);
+        deleteRegisterRepository.save(addUserToRegister);
 
-            deleteRegisterRepository.save(addUserToRegister);
+        userRepository.save(searchForAccount);
 
-            userRepository.save(searchForAccount);
-
-            mailService.setupDeletionEmailLogic(searchForAccount.getEmail());
-
-            return;
-
-        }
-
-        throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
+        mailService.setupDeletionEmailLogic(searchForAccount.getEmail());
 
     }
 
     public User findUserById (Long id) {
 
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
 
     }
 
     public User getProfileById (HttpHeaders headers, Long id) {
 
-        var searchForAccount = userRepository.findById(id)
-                                             .orElse(null);
+        var searchForAccount = userRepository
+                                .findById(id)
+                                .orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
 
-        if (searchForAccount != null) {
+        authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
 
-            authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
-
-            return searchForAccount;
-
-        }
-
-        throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
+        return searchForAccount;
 
     }
 
@@ -170,20 +172,13 @@ public class UserServices {
 
         long id = decodeId[0];
 
-        var searchForAccount = userRepository.findById(id)
-                                             .orElse(null);
+        var searchForAccount = userRepository
+                                .findById(id)
+                                .orElseThrow(() -> new UserNotFoundException("We weren't able to find a user with this id: " + id));
 
-        if (searchForAccount != null) {
+        searchForAccount.activate();
 
-            searchForAccount.activate();
-
-            userRepository.save(searchForAccount);
-
-            return;
-
-        }
-
-        throw new UserNotFoundException("We weren't able to find a user with this id: " + id);
+        userRepository.save(searchForAccount);
 
     }
 

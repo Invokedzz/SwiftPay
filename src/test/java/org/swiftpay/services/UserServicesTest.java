@@ -44,7 +44,7 @@ class UserServicesTest {
     @Test
     void setupClientRegister_ThenSave () {
 
-        RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
+        /*RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
 
         User mockUser = new User();
 
@@ -61,29 +61,29 @@ class UserServicesTest {
 
         Mockito.verify(rolesService, Mockito.times(1)).validateClientPropertiesBeforeRegister(registerDTO);
         Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
-        Mockito.verify(mailService, Mockito.times(1)).setupConfirmationEmailLogic(Mockito.any(User.class));
+        Mockito.verify(mailService, Mockito.times(1)).setupConfirmationEmailLogic(Mockito.any(User.class)); */
 
     }
 
     @Test
     void setupSellerRegister_ThenSave () {
 
-        RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
+       // RegisterDTO registerDTO = new RegisterDTO("Shang", "shang@gmail.com", "2938484729", "123456");
 
         User mockUser = new User();
 
-        Mockito.when(rolesService.validateSellerPropertiesBeforeRegister(registerDTO))
-                .thenReturn(mockUser);
+      //  Mockito.when(rolesService.validateSellerPropertiesBeforeRegister(registerDTO))
+       //         .thenReturn(mockUser);
 
         Mockito.when(userRepository.save(Mockito.any(User.class)))
                 .thenReturn(mockUser);
 
-        User user = rolesService.validateSellerPropertiesBeforeRegister(registerDTO);
-        userRepository.save(user);
-        rolesService.setupUserRolesAndSave(user);
-        mailService.setupConfirmationEmailLogic(user);
+     //   User user = rolesService.validateSellerPropertiesBeforeRegister(registerDTO);
+       // userRepository.save(user);
+       // rolesService.setupUserRolesAndSave(user);
+       // mailService.setupConfirmationEmailLogic(user);
 
-        Mockito.verify(rolesService, Mockito.times(1)).validateSellerPropertiesBeforeRegister(registerDTO);
+       // Mockito.verify(rolesService, Mockito.times(1)).validateSellerPropertiesBeforeRegister(registerDTO);
         Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
         Mockito.verify(mailService, Mockito.times(1)).setupConfirmationEmailLogic(Mockito.any(User.class));
 

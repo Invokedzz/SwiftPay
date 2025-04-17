@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.swiftpay.dtos.CustomerRequestDTO;
+import org.swiftpay.dtos.CustomerResponseDTO;
 import org.swiftpay.dtos.RegisterDTO;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +38,13 @@ public class User implements UserDetails {
 
     private String password;
 
+    private LocalDate birthDate;
+
+    private BigDecimal incomeValue;
+
+    @Column(unique = true)
+    private String postalCode;
+
     private Boolean active;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -51,7 +60,7 @@ public class User implements UserDetails {
 
     public User (RegisterDTO registerUserDTO) {
 
-        this.username = registerUserDTO.username();
+        this.username = registerUserDTO.name();
 
         this.email = registerUserDTO.email();
 
@@ -59,17 +68,13 @@ public class User implements UserDetails {
 
         this.password = registerUserDTO.password();
 
+        this.birthDate = registerUserDTO.birthDate();
+
+        this.incomeValue = registerUserDTO.incomeValue();
+
+        this.postalCode = registerUserDTO.postalCode();
+
         this.active = false;
-
-    }
-
-    public User (CustomerRequestDTO customerRequestDTO) {
-
-        this.username = customerRequestDTO.name();
-
-        this.email = customerRequestDTO.email();
-
-        this.cpfCnpj = customerRequestDTO.cpfCnpj();
 
     }
 

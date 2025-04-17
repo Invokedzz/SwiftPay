@@ -15,9 +15,9 @@ public class AsaasService {
 
     private final AsaasRepository asaasRepository;
 
-    public CustomerResponseDTO registerCustomerInAsaas (CustomerRequestDTO customerRequestDTO) {
+    public CustomerResponseDTO registerCustomerInAsaas (RegisterDTO registerDTO) {
 
-        return customerClient.createCustomer(customerRequestDTO);
+        return customerClient.createCustomer(registerDTO);
 
     }
 

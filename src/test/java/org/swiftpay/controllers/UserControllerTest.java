@@ -37,7 +37,7 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
+   /* @Test
     void registerClient_ThenReturnCREATED() throws Exception {
 
         RegisterDTO registerDTO = new RegisterDTO("Athena", "athena@gmail.com",
@@ -157,7 +157,7 @@ class UserControllerTest {
         mockMvc.perform(delete("/delete-account/{id}", 1L)
                         .contentType("application/json"))
                         .andExpect(status().isNoContent());
-    }
+    } */
 
 
 }

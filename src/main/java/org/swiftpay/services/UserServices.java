@@ -13,7 +13,6 @@ import org.swiftpay.model.User;
 import org.swiftpay.repositories.DeleteRegisterRepository;
 import org.swiftpay.repositories.UserRepository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -46,6 +45,8 @@ public class UserServices {
 
     private final AsaasService asaasService;
 
+    private final WalletService walletService;
+
     @Transactional
     public CustomerResponseDTO registerAsClient (RegisterDTO registerDTO) {
 
@@ -53,22 +54,15 @@ public class UserServices {
 
         userRepository.save(validatedClient);
 
-        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(
-
-                new CustomerRequestDTO(validatedClient.getUsername(),
-                                        validatedClient.getEmail(),
-                                        validatedClient.getCpfCnpj(),
-                                        LocalDate.parse("2004-10-02"),
-                                        BigDecimal.valueOf(2400),
-                                    "05351000")
-
-        );
+        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(registerDTO);
 
         asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedClient));
 
         rolesService.setupUserRolesAndSave(validatedClient);
 
         mailService.setupConfirmationEmailLogic(validatedClient);
+
+        walletService.save(validatedClient, customerResponseDTO.walletId());
 
         return customerResponseDTO;
 
@@ -81,20 +75,13 @@ public class UserServices {
 
         userRepository.save(validatedSeller);
 
-        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(
-
-                new CustomerRequestDTO(validatedSeller.getUsername(),
-                                       validatedSeller.getEmail(),
-                                       validatedSeller.getCpfCnpj(),
-                                       LocalDate.parse("2004-10-02"),
-                                       BigDecimal.valueOf(1200),
-                                "Sao Paulo - SP")
-
-        );
+        CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(registerDTO);
 
         asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedSeller));
 
         rolesService.setupUserRolesAndSave(validatedSeller);
+
+        walletService.save(validatedSeller, customerResponseDTO.walletId());
 
         mailService.setupConfirmationEmailLogic(validatedSeller);
 
@@ -217,6 +204,5 @@ public class UserServices {
         return deleteRegister;
 
     }
-
 
 }

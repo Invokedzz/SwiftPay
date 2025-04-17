@@ -1,9 +1,11 @@
 package org.swiftpay.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Schema(name = "Register Data Access Object")
 public record RegisterDTO(
@@ -11,7 +13,7 @@ public record RegisterDTO(
         @NotBlank(message = "Username field cannot be blank!")
         @Schema(example = "Sephiroth", minLength = 3, maxLength = 20)
         @Length(min = 3, max = 20, message = "Username field must contain 3 to 20 characters!")
-        String username,
+        String name,
 
         @Schema(example = "email@gmail.com", maxLength = 254)
         @Email(message = "Invalid Email. Please, try again!")
@@ -24,6 +26,16 @@ public record RegisterDTO(
         @NotBlank(message = "Password field cannot be blank!")
         @Length(min = 6, max = 15, message = "Password field must contain 6 to 15 characters!")
         @Schema(minLength = 6, maxLength = 15, example = "Coffee, please")
-        String password
+        String password,
 
-) {}
+        @Past
+        LocalDate birthDate,
+
+        @NotNull
+        BigDecimal incomeValue,
+
+        @Length(min = 8, max = 8, message = "Enter a valid length for your CEP!")
+        @Pattern(regexp = "^\\d{5}-?\\d{3}$", message = "Enter a valid CEP format (xxxxx-xxx or xxxxxxxx)!")
+        String postalCode
+
+        ) {}

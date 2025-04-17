@@ -69,9 +69,9 @@ public class TransferService {
 
         payee.getWallet().setBalance(payee.getWallet().getBalance().add(value));
 
-        walletService.save(payer.getWallet());
+        walletService.saveSandboxWallet(payer.getWallet());
 
-        walletService.save(payee.getWallet());
+        walletService.saveSandboxWallet(payee.getWallet());
 
     }
 

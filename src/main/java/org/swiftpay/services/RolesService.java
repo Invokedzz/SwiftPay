@@ -30,8 +30,6 @@ public class RolesService {
 
         User user = new User(registerDTO);
 
-        Wallet wallet = new Wallet();
-
         cpfValidator.assertValid(user.getCpfCnpj());
 
         if (cpfValidator.isEligible(user.getCpfCnpj())) {
@@ -39,12 +37,6 @@ public class RolesService {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
 
             user.setPassword(encodedPassword);
-
-            wallet.setBalance(BigDecimal.valueOf(500.0));
-
-            wallet.setUser(user);
-
-            user.setWallet(wallet);
 
             return user;
 
@@ -58,8 +50,6 @@ public class RolesService {
 
         User user = new User(registerDTO);
 
-        Wallet wallet = new Wallet();
-
         cnpjValidator.assertValid(user.getCpfCnpj());
 
         if (cnpjValidator.isEligible(user.getCpfCnpj())) {
@@ -67,12 +57,6 @@ public class RolesService {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
 
             user.setPassword(encodedPassword);
-
-            wallet.setBalance(BigDecimal.valueOf(0.0));
-
-            wallet.setUser(user);
-
-            user.setWallet(wallet);
 
             return user;
 

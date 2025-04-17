@@ -2,7 +2,6 @@ package org.swiftpay.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.swiftpay.infrastructure.clients.AsaasWalletClient;
 import org.swiftpay.model.User;
 import org.swiftpay.model.Wallet;
 import org.swiftpay.repositories.WalletRepository;
@@ -14,8 +13,6 @@ import java.math.BigDecimal;
 public class WalletService {
 
     private final WalletRepository walletRepository;
-
-    private final AsaasWalletClient asaasWalletClient;
 
     public void save (User user, String walletId) {
 

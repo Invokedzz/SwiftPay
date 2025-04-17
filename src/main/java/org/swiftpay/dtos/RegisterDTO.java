@@ -29,11 +29,14 @@ public record RegisterDTO(
         String password,
 
         @Past
+        @Schema(example = "2003-10-02")
         LocalDate birthDate,
 
         @NotNull
+        @Schema(example = "2550", minLength = 2, maxLength = 7)
         BigDecimal incomeValue,
 
+        @Schema(example = "79841350")
         @Length(min = 8, max = 8, message = "Enter a valid length for your CEP!")
         @Pattern(regexp = "^\\d{5}-?\\d{3}$", message = "Enter a valid CEP format (xxxxx-xxx or xxxxxxxx)!")
         String postalCode

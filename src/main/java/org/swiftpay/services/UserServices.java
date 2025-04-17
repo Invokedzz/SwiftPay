@@ -48,7 +48,7 @@ public class UserServices {
     private final WalletService walletService;
 
     @Transactional
-    public CustomerResponseDTO registerAsClient (RegisterDTO registerDTO) {
+    public void registerAsClient (RegisterDTO registerDTO) {
 
         var validatedClient = rolesService.validateClientPropertiesBeforeRegister(registerDTO);
 
@@ -63,8 +63,6 @@ public class UserServices {
         mailService.setupConfirmationEmailLogic(validatedClient);
 
         walletService.save(validatedClient, customerResponseDTO.walletId());
-
-        return customerResponseDTO;
 
     }
 
@@ -81,9 +79,9 @@ public class UserServices {
 
         rolesService.setupUserRolesAndSave(validatedSeller);
 
-        walletService.save(validatedSeller, customerResponseDTO.walletId());
-
         mailService.setupConfirmationEmailLogic(validatedSeller);
+
+        walletService.save(validatedSeller, customerResponseDTO.walletId());
 
     }
 

@@ -1,5 +1,6 @@
 package org.swiftpay.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -13,5 +14,7 @@ public class AIAssistantService {
         this.chatClient = chatClient.build();
 
     }
+
+
 
 }

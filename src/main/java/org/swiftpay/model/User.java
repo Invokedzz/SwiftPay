@@ -27,22 +27,25 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String cpfCnpj;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private LocalDate birthDate;
 
+    @Column(nullable = false)
     private BigDecimal incomeValue;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String postalCode;
 
     private Boolean active;

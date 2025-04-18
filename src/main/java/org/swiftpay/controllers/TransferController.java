@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.dtos.PaymentRequestDTO;
@@ -54,7 +55,7 @@ public record TransferController (TransferService transferService) {
 
         transferService.transferToSomeoneSandbox(headers, transferDTO);
 
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
     }
 

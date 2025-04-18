@@ -6,5 +6,7 @@ import org.swiftpay.model.DeleteRegister;
 
 @Repository
 public interface DeleteRegisterRepository extends JpaRepository <DeleteRegister, Long> {
-    void deleteByUser_Id(Long userId);
+
+    void deleteByUser_Id (Long userId);
+
 }

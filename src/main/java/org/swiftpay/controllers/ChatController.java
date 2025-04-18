@@ -5,10 +5,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.swiftpay.dtos.ChatDTO;
 import org.swiftpay.dtos.CreateChatDTO;
+import org.swiftpay.dtos.EditChatDTO;
 import org.swiftpay.dtos.UserChatsDTO;
-import org.swiftpay.services.AIAssistantService;
 import org.swiftpay.services.ChatService;
 
 import java.util.Set;
@@ -26,19 +25,21 @@ public record ChatController (ChatService chatService) {
 
     }
 
-    @GetMapping("/{id}")
-    private ResponseEntity <Set<UserChatsDTO>> findChatByUserId (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+    @GetMapping
+    private ResponseEntity <Set<UserChatsDTO>> findChatByUserId (@RequestHeader HttpHeaders headers) {
 
-        var chats = chatService.findChatByUserId(headers, id);
+        var chats = chatService.findChatByUserId(headers);
 
-        return ResponseEntity.ok().body(chats);
+        return ResponseEntity.status(HttpStatus.OK).body(chats);
 
     }
 
     @PutMapping("/{id}/edit")
-    private ResponseEntity <Void> editChat (@PathVariable Long id) {
+    private ResponseEntity <Void> editChat (@RequestHeader HttpHeaders headers, @Valid @RequestBody EditChatDTO editChatDTO, @PathVariable Long id) {
 
-        return ResponseEntity.ok().body(null);
+        chatService.editChat(headers, editChatDTO, id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 

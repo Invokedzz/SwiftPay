@@ -10,7 +10,6 @@ import org.swiftpay.exceptions.ChatNotFoundException;
 import org.swiftpay.model.Chat;
 import org.swiftpay.repositories.ChatRepository;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +23,8 @@ public class ChatService {
 
     private final AuthService authService;
 
+    private final TokenAuthService tokenAuthService;
+
     public void createChat (HttpHeaders headers, CreateChatDTO createChatDTO) {
 
         authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, createChatDTO.userId());
@@ -34,7 +35,9 @@ public class ChatService {
 
     }
 
-    public Set <UserChatsDTO> findChatByUserId (HttpHeaders headers, Long id) {
+    public Set <UserChatsDTO> findChatByUserId (HttpHeaders headers) {
+
+        Long id = tokenAuthService.findSessionId(headers);
 
         authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, id);
 
@@ -54,9 +57,19 @@ public class ChatService {
 
     }
 
-    public void editChat (EditChatDTO editChatDTO) {
+    public void editChat (HttpHeaders headers, EditChatDTO editChatDTO, Long id) {
 
+        Long userId = tokenAuthService.findSessionId(headers);
 
+        authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, userId);
+
+        var chat = chatRepository
+                    .findById(id)
+                    .orElseThrow(() -> new ChatNotFoundException("Chat not found!"));
+
+        chat.setTitle(editChatDTO.title());
+
+        chatRepository.save(chat);
 
     }
 

@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.swiftpay.dtos.CreateChatDTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -24,7 +26,20 @@ public class Chat {
     private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private List <ChatMessages> messages;
+
+    public Chat (String title, User user) {
+
+        this.title = title;
+
+        this.createdAt = LocalDate.now();
+
+        this.user = user;
+
+    }
 
 }

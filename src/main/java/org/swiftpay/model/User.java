@@ -61,6 +61,9 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Asaas asaas;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List <Chat> chat;
+
     public User (RegisterDTO registerUserDTO) {
 
         this.username = registerUserDTO.name();

@@ -22,7 +22,6 @@ public class Asaas {
     private String asaasId;
 
     @OneToOne
-    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 

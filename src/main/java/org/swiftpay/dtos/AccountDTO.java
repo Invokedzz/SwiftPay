@@ -6,7 +6,7 @@ import org.swiftpay.model.User;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(name = "Account Data Access Object", description = "For users that want to access their account. Without any worries.")
+@Schema(name = "Account Data Transfer Object", description = "For users that want to access their account. Without any worries.")
 public record AccountDTO (
 
         @Schema(example = "Cloud")

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-@Schema(name = "Transfer Data Access Object")
+@Schema(name = "Transfer Data Transfer Object")
 public record TransferDTO (
 
         @DecimalMin("0.01")

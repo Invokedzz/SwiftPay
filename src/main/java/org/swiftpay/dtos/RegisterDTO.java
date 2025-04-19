@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(name = "Register Data Access Object")
+@Schema(name = "Register Data Transfer Object")
 public record RegisterDTO(
 
         @NotBlank(message = "Username field cannot be blank!")

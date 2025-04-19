@@ -137,7 +137,6 @@ public record UserController (UserServices userServices) {
 
     })
 
-    @SecurityRequirement(name = "bearerAuth")
     private ResponseEntity <AccountDTO> userProfile (@RequestHeader HttpHeaders headers, @PathVariable Long id) {
 
         var users = userServices.getProfileById(headers, id);

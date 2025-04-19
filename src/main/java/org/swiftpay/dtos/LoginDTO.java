@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
-@Schema(name = "Login Data Access Object")
+@Schema(name = "Login Data Transfer Object")
 public record LoginDTO (
 
         @NotBlank(message = "Username field cannot be blank!")

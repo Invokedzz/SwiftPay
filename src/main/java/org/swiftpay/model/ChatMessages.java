@@ -16,6 +16,7 @@ import java.time.LocalDate;
 public class ChatMessages {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -27,5 +28,15 @@ public class ChatMessages {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
+
+    public ChatMessages (String message, Chat chat) {
+
+        this.message = message;
+
+        this.createdAt = LocalDate.now();
+
+        this.chat = chat;
+
+    }
 
 }

@@ -1,5 +1,6 @@
 package org.swiftpay.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,14 @@ public class ChatService {
 
     }
 
+    public Chat findChatById (Long id) {
+
+        return chatRepository
+                .findById(id)
+                .orElseThrow(() -> new ChatNotFoundException("Chat not found!"));
+
+    }
+
     public Set <UserChatsDTO> findChatByUserId (HttpHeaders headers) {
 
         Long id = tokenAuthService.findSessionId(headers);
@@ -57,6 +66,7 @@ public class ChatService {
 
     }
 
+    @Transactional
     public void editChat (HttpHeaders headers, EditChatDTO editChatDTO, Long id) {
 
         Long userId = tokenAuthService.findSessionId(headers);
@@ -73,6 +83,7 @@ public class ChatService {
 
     }
 
+    @Transactional
     public void deleteChat (Long id) {
 
         var searchForChat = chatRepository

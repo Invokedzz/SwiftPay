@@ -169,7 +169,7 @@ public class UserServices {
 
     @Transactional
     @Scheduled(cron = "0 30 12 * * ?")
-    protected void deleteInactiveAccounts () {
+    public void deleteInactiveAccounts () {
 
         var allDeleteRegisters = deleteRegisterRepository.findAll();
 

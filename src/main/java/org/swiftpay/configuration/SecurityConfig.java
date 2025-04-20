@@ -43,7 +43,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(custom -> custom.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.requestMatchers("/register/seller", "/register/client", "/login", "/activate-account", "/reactivate-account", "/all").permitAll())
-                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/profile/{id}", "/transfer/**", "chat/**", "/api/message/**").hasAnyRole("CLIENT", "SELLER"))
+                .authorizeHttpRequests(req -> req.requestMatchers("/delete-account/{id}", "/profile/{id}", "/transfer/**", "chat/**", "message/**").hasAnyRole("CLIENT", "SELLER"))
                 .authorizeHttpRequests(req -> req.requestMatchers(AUTH_WHITELIST).permitAll())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 

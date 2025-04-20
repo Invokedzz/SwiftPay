@@ -52,6 +52,21 @@ public class ErrorsHandler {
 
     }
 
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity <ErrorDTO> handleMessageNotFoundException (MessageNotFoundException ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity <ErrorDTO> handleMethodArgumentNotValidException (MethodArgumentNotValidException ex) {
 

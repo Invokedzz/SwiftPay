@@ -22,6 +22,8 @@ public class ChatMessages {
     @Column(nullable = false)
     private String message;
 
+    private String response;
+
     @Column(nullable = false)
     private LocalDate createdAt;
 
@@ -29,11 +31,13 @@ public class ChatMessages {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
-    public ChatMessages (String message, Chat chat) {
+    public ChatMessages (String message, String response, Chat chat) {
 
         this.message = message;
 
         this.createdAt = LocalDate.now();
+
+        this.response = response;
 
         this.chat = chat;
 

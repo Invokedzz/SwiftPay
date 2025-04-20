@@ -1,4 +1,3 @@
 package org.swiftpay.dtos;
 
-public record MessageDTO () {
-}
+public record MessageDTO (String message, String response) {}

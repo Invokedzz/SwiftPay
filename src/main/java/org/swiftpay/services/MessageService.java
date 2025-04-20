@@ -51,7 +51,8 @@ public class MessageService {
 
             var messages = messagesRepository.findByChat(searchForChat);
 
-            return messages.stream()
+            return messages
+                    .stream()
                     .map(m -> new MessageDTO(m.getMessage(), m.getResponse()))
                     .toList();
         }

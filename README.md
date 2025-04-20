@@ -1,64 +1,54 @@
-# 💳 SwiftPay API
+## Introdução
 
-**SwiftPay** is a payment API designed for digital stores looking to integrate a **simple, secure, and efficient** payment system.
+A SwiftPay é uma API desenvolvida para tornar a criação de plataformas digitais mais simples para os desenvolvedores, ao mesmo tempo em que oferece um sistema robusto e seguro para os usuários finais.
 
-## 🚀 Overview
+Atualmente, a API conta com as seguintes features:
 
-Built with **Spring Boot**, SwiftPay follows best practices in the Java ecosystem. It provides modern authentication, security, and scalability features, making it ideal for high-demand production environments.
+- Criação e gerenciamento de usuários;
 
----
+- Transações via PIX;
 
-## 🛠️ Technologies Used
+- Assistente virtual com sistema de chat para suporte ao usuário;
 
-- **Java** – Core programming language.
-- **Spring Boot** – Framework for building robust APIs.
-- **Spring Security** – Authentication and authorization layer.
-- **JWT (JSON Web Token)** – Token-based authentication.
-- **Spring AI** – Intelligent features and AI-powered capabilities.
-- **JUnit & Mockito** – Automated unit and integration testing.
-- **Docker** – Containerization for portable deployments.
-- **AWS** – Cloud-ready architecture for scalable deployments.
+- Ambiente sandbox para testes de transações e integração com APIs externas à SwiftPay;
 
----
+- Deleção automática de usuários inativos.
 
-## 🔒 Security
+A SwiftPay está em constante evolução. Já estamos trabalhando em novas funcionalidades que serão adicionadas em breve, como:
 
-Authentication is handled using **JWT**, ensuring that only authorized users can access protected endpoints. **Spring Security** enforces strict access control and role-based permissions.
+- [ ] Transações via cartão de crédito e débito
+- [ ] Criação de transações via assistante virtual
+- [ ] Emissão de boletos e faturas
 
-## 🧠 Intelligence with Spring AI
+## Tecnologias
 
-The API integrates with **Spring AI** to enable intelligent features and automation powered by artificial intelligence.
+Nossa ideia quando fizemos o projeto, não era torná-lo só algo prático, mas também algo seguro. Tendo isso em mente, fizemos uso das seguintes tecnologias:
 
-## 🧪 Automated Testing
+- Springboot;
+- Spring Security;
+- Spring AI;
+- Spring Data JPA;
+- JWT (Json Web Token);
+- Mockito/JUnit;
+- Docker;
+- Swagger;
+- AWS (Amazon Web Services).
 
-The project includes a robust testing suite using **JUnit** and **Mockito**, ensuring code reliability and maintaining high-quality standards throughout the development lifecycle.
+## Arquitetura
 
----
+Optamos por utilizar a **arquitetura monolito** na fase atual da SwiftPay por ser uma abordagem mais simples, eficiente e adequada para o estágio de desenvolvimento do projeto.
 
-## 🐳 Docker Containerization
+Com todos os componentes integrados em um único código-base, conseguimos acelerar o desenvolvimento, facilitar testes e manter um fluxo de deploy mais direto e confiável.
 
-SwiftPay is fully **containerized using Docker**, allowing easy deployment across different environments.
+### 🔍 O que é uma arquitetura monolito?
 
-```bash
+A arquitetura monolito é um modelo em que toda a aplicação — incluindo backend, frontend, lógica de negócios e integrações com o banco de dados — está centralizada em uma única aplicação.
 
-#Build
-docker build -t swiftpay .
+## Design Patterns
 
-#Then run!
-docker run -p 8080:8080 swiftpay
-```
----
+## Como rodar o projeto
 
-## 📄 API Documentation
-
-The complete API documentation (endpoints, payloads, authentication, etc.) is available via Swagger:
-
-```bash
-
-/swagger-ui.html
-
-```
-
+## Licença
 
 
 

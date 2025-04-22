@@ -3,7 +3,9 @@ package org.swiftpay.infrastructure.clients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.configuration.AsaasConfig;
+import org.swiftpay.dtos.BankTransferResponseDTO;
 import org.swiftpay.dtos.TransferRequestDTO;
+import org.swiftpay.dtos.TransferResponseDTO;
 import org.swiftpay.dtos.TransferStatusDTO;
 
 import java.time.LocalDate;
@@ -13,16 +15,16 @@ import java.util.List;
 public interface AsaasTransferClient {
 
     @PostMapping
-    void transferToBankAccounts (@RequestBody TransferRequestDTO transferRequestDTO);
+    BankTransferResponseDTO transferToBankAccounts (@RequestBody TransferRequestDTO transferRequestDTO);
 
     @PostMapping("/")
-    void transferToAsaasAccount (@RequestBody TransferRequestDTO transferRequestDTO);
+    TransferResponseDTO transferToAsaasAccount (@RequestBody TransferRequestDTO transferRequestDTO);
 
     @GetMapping
     List <TransferStatusDTO> getTransfers (@RequestParam LocalDate createdAt);
 
     @GetMapping("/{id}")
-    TransferStatusDTO getTransfer (@PathVariable String id);
+    TransferStatusDTO getIndividualTransfer (@PathVariable String id);
 
     @DeleteMapping("/{id}/cancel")
     void cancelTransfer (@PathVariable String id);

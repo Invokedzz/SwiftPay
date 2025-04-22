@@ -1,4 +1,6 @@
 package org.swiftpay.dtos;
 
-public record TransferRequestDTO () {
+import java.math.BigDecimal;
+
+public record TransferRequestDTO (BigDecimal value, String walletId) {
 }

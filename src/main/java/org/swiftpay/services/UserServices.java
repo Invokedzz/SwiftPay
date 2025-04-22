@@ -37,7 +37,7 @@ public class UserServices {
 
     private final MailService mailService;
 
-    private final AsaasService asaasService;
+    private final CustomerService asaasService;
 
     private final WalletService walletService;
 

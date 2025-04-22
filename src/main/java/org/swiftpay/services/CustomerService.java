@@ -9,7 +9,7 @@ import org.swiftpay.repositories.AsaasRepository;
 
 @Service
 @RequiredArgsConstructor
-public class AsaasService {
+public class CustomerService {
 
     private final AsaasAccountsClient customerClient;
 

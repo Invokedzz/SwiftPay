@@ -52,6 +52,8 @@ public class UserServices {
 
         var validatedClient = rolesService.validateClientPropertiesBeforeRegister(registerDTO);
 
+        checkIfAnyOfTheseInformationAlreadyExist(validatedClient);
+
         userRepository.save(validatedClient);
 
         CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(registerDTO);
@@ -180,6 +182,52 @@ public class UserServices {
                 deleteRegisterRepository.delete(deleteRegister);
 
             }
+
+        }
+
+    }
+
+    private void checkIfEmailAlreadyExists (String email) {
+
+        var searchForEmail = userRepository.findByEmail(email);
+
+        if (searchForEmail.isPresent()) {
+
+            throw new InvalidEmailFormatException("Email already exists!");
+
+        }
+
+    }
+
+    private void checkIfAnyOfTheseInformationAlreadyExist (User user) {
+
+        checkIfEmailAlreadyExists(user.getEmail());
+
+        checkIfCPFCNPJAlreadyExists(user.getCpfCnpj());
+
+        checkIfUsernameAlreadyExists(user.getUsername());
+
+    }
+
+    private void checkIfUsernameAlreadyExists (String username) {
+
+        var searchForUsername = userRepository.findByUsernameEqualsIgnoreCase(username);
+
+        if (searchForUsername.isPresent()) {
+
+            throw new UsernameAlreadyExistsException("Username already exists!");
+
+        }
+
+    }
+
+    private void checkIfCPFCNPJAlreadyExists (String cpfCnpj) {
+
+        var searchForCpfCnpj = userRepository.findByCpfCnpj(cpfCnpj);
+
+        if (searchForCpfCnpj.isPresent()) {
+
+            throw new CPFCNPJAlreadyExistsException("CPF/CNPJ already exists!");
 
         }
 

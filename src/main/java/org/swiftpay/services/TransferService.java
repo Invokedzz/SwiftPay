@@ -31,7 +31,7 @@ public class TransferService {
 
     private final AuthorizationService authorizationService;
 
-    private final AsaasService pixService;
+    private final AsaasService asaasService;
 
     private final AuthService authService;
 

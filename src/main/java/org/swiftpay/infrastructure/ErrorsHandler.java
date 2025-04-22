@@ -97,6 +97,9 @@ public class ErrorsHandler {
             SelfTransferException.class,
             InvalidAmountException.class,
             InvalidTypeOfPayerException.class,
+            InvalidEmailFormatException.class,
+            CPFCNPJAlreadyExistsException.class,
+            UsernameAlreadyExistsException.class,
 
     })
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {

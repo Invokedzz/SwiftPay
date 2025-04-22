@@ -4,17 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hashids.Hashids;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.*;
-import org.swiftpay.model.DeleteRegister;
 import org.swiftpay.model.User;
-import org.swiftpay.repositories.DeleteRegisterRepository;
 import org.swiftpay.repositories.UserRepository;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +29,7 @@ public class UserServices {
 
     private final UserRepository userRepository;
 
-    private final DeleteRegisterRepository deleteRegisterRepository;
+    private final DeleteRegisterService deleteRegisterService;
 
     private final RolesService rolesService;
 
@@ -106,7 +100,7 @@ public class UserServices {
 
         userRepository.save(searchForAccount);
 
-        deleteRegisterRepository.deleteByUser_Id(searchForAccount.getId());
+        deleteRegisterService.deleteUserFromRegister(searchForAccount.getId());
 
     }
 
@@ -121,9 +115,9 @@ public class UserServices {
 
         searchForAccount.deactivate();
 
-        var addUserToRegister = setupDeletionRegister(searchForAccount);
+        var setupUserToEnterInTheRegister = deleteRegisterService.setupDeletionRegister(searchForAccount);
 
-        deleteRegisterRepository.save(addUserToRegister);
+        deleteRegisterService.saveUserIntoRegister(setupUserToEnterInTheRegister);
 
         userRepository.save(searchForAccount);
 
@@ -166,24 +160,6 @@ public class UserServices {
         searchForAccount.activate();
 
         userRepository.save(searchForAccount);
-
-    }
-
-    @Transactional
-    @Scheduled(cron = "0 30 12 * * ?")
-    public void deleteInactiveAccounts () {
-
-        var allDeleteRegisters = deleteRegisterRepository.findAll();
-
-        for (DeleteRegister deleteRegister : allDeleteRegisters) {
-
-            if (checkDaysBeforeAccountDeletion(deleteRegister.getDeleteDate()) > 0) {
-
-                deleteRegisterRepository.delete(deleteRegister);
-
-            }
-
-        }
 
     }
 
@@ -230,24 +206,6 @@ public class UserServices {
             throw new CPFCNPJAlreadyExistsException("CPF/CNPJ already exists!");
 
         }
-
-    }
-
-    private Long checkDaysBeforeAccountDeletion (LocalDate date) {
-
-        return ChronoUnit.DAYS.between(LocalDate.now(), date);
-
-    }
-
-    private DeleteRegister setupDeletionRegister (User user) {
-
-        DeleteRegister deleteRegister = new DeleteRegister();
-
-        deleteRegister.setUser(user);
-
-        deleteRegister.setDeleteDate(LocalDate.now());
-
-        return deleteRegister;
 
     }
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.infrastructure.clients.AuthorizationClient;
 import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
+import org.swiftpay.model.User;
 
 import java.math.BigDecimal;
 
@@ -31,6 +32,12 @@ public class AuthorizationService {
     public void compareValueAndBalance (BigDecimal balance, BigDecimal value) {
 
         transferAuthorizationPolicy.validateValueThatIsGoingToBeTransferred(balance, value);
+
+    }
+
+    public void checkIfPayerIsASeller (User payer) {
+
+        transferAuthorizationPolicy.validateUserRolesBeforeTransfer(payer);
 
     }
 

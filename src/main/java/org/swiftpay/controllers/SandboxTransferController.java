@@ -1,6 +1,5 @@
 package org.swiftpay.controllers;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -11,24 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.dtos.TransferDTO;
-import org.swiftpay.services.TransferService;
+import org.swiftpay.services.SandboxTransferService;
 
 @RestController
-@RequestMapping("/transfer")
+@RequestMapping("/transfer-sandbox")
 @Tag(name = "Transfer", description = "Endpoints related to transfer. Sandbox ver.")
-public record TransferController (TransferService transferService) {
+public record SandboxTransferController(SandboxTransferService sandboxTransferService) {
 
-    @Hidden
     @PostMapping
-    private ResponseEntity <Void> transfer (@Valid @RequestBody TransferDTO transferDTO) {
-
-        transferService.transferToSomeone(transferDTO);
-
-        return ResponseEntity.ok().body(null);
-
-    }
-
-    @PostMapping("/sandbox")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(description = "Have fun using the sandbox. Make transfers, and enjoy", responses = {
 
@@ -52,7 +41,7 @@ public record TransferController (TransferService transferService) {
 
     private ResponseEntity <Void> transferSandboxVer (@RequestHeader HttpHeaders headers, @Valid @RequestBody TransferDTO transferDTO) {
 
-        transferService.transferToSomeoneSandbox(headers, transferDTO);
+        sandboxTransferService.transferToSomeoneSandbox(headers, transferDTO);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 

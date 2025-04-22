@@ -1,4 +1,4 @@
 package org.swiftpay.dtos;
 
-public record TransferResponseDTO() {
+public record TransferResponseDTO () {
 }

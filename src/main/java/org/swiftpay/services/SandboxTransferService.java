@@ -3,13 +3,9 @@ package org.swiftpay.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-import org.swiftpay.dtos.PaymentRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
-import org.swiftpay.dtos.PaymentResponseDTO;
 import org.swiftpay.exceptions.APIErrorException;
-import org.swiftpay.exceptions.InvalidTypeOfPayerException;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
@@ -19,7 +15,7 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-public class TransferService {
+public class SandboxTransferService {
 
     private final UserServices userServices;
 
@@ -31,12 +27,7 @@ public class TransferService {
 
     private final AuthorizationService authorizationService;
 
-    private final AsaasService asaasService;
-
     private final AuthService authService;
-
-    @Transactional
-    public void transferToSomeone (TransferDTO transferDTO) {}
 
     @Transactional
     public void transferToSomeoneSandbox (HttpHeaders headers, TransferDTO transferDTO) {
@@ -47,7 +38,7 @@ public class TransferService {
 
         authService.compareIdFromTheSessionWithTheIdInTheUrl(headers, payer.getId());
 
-        validateUserRolesBeforeTransfer(payer);
+        authorizationService.checkIfPayerIsASeller(payer);
 
         authorizationService.validateTransferBody(transferDTO);
 
@@ -92,21 +83,6 @@ public class TransferService {
         if (!authorizationService.validateTransfer()) {
 
             throw new APIErrorException("The API is not accepting transfers right now. Please, try again sometime.");
-
-        }
-
-    }
-
-    private void validateUserRolesBeforeTransfer (User payer) {
-
-        var payerAuthorities = payer.getAuthorities()
-                              .stream()
-                              .map(GrantedAuthority::getAuthority)
-                              .toList();
-
-        if (payerAuthorities.getFirst().equals("ROLE_SELLER")) {
-
-            throw new InvalidTypeOfPayerException("You're not allowed to transfer as a seller!");
 
         }
 

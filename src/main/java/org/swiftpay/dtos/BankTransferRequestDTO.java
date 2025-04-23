@@ -1,4 +1,5 @@
 package org.swiftpay.dtos;
 
-public record BankTransferRequestDTO () {
-}
+import java.math.BigDecimal;
+
+public record BankTransferRequestDTO (BigDecimal value, BankDTO bankAccount) {}

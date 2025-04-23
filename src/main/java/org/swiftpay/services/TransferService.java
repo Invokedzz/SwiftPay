@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.infrastructure.clients.AsaasTransferClient;
+import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
 
@@ -25,10 +26,12 @@ public class TransferService {
 
     private final TokenAuthService tokenAuthService;
 
+    private final WalletService walletService;
+
     private final AuthorizationService authorizationService;
 
     @Transactional
-    public BankTransferResponseDTO transferToBankAccounts (BankTransferRequestDTO transferRequestDTO) {
+    public TransferResponseDTO transferToBankAccounts (BankTransferRequestDTO transferRequestDTO) {
 
         return null;
 
@@ -39,9 +42,9 @@ public class TransferService {
 
         Long payerId = tokenAuthService.findSessionId(headers);
 
-        var payer = userServices.findUserById(payerId);
+        var payer = findPayerById(payerId);
 
-        var payee = userServices.findUserByWalletId(transferRequestDTO.walletId());
+        var payee = findPayeeByWalletId(transferRequestDTO.walletId());
 
         authorizationService.checkIfPayerIsASeller(payer);
 
@@ -49,7 +52,11 @@ public class TransferService {
 
         transference(payer, payee, transferRequestDTO.value());
 
-        return asaasTransferClient.transferToAsaasAccount(transferRequestDTO);
+        var transferResponseDTO = asaasTransferClient.transferToAsaasAccount(transferRequestDTO);
+
+        transferRepository.save(new Transfer(transferResponseDTO, payer, payee));
+
+        return transferResponseDTO;
 
     }
 
@@ -65,9 +72,21 @@ public class TransferService {
 
     }
 
-    public void cancelTransfer (String id) {
+    public TransferStatusDTO cancelTransfer (String id) {
 
+        return asaasTransferClient.cancelTransfer(id);
 
+    }
+
+    private User findPayerById (Long id) {
+
+        return userServices.findUserById(id);
+
+    }
+
+    private User findPayeeByWalletId (String walletId) {
+
+        return userServices.findUserByWalletId(walletId);
 
     }
 
@@ -76,6 +95,10 @@ public class TransferService {
         payer.getWallet().setBalance(payer.getWallet().getBalance().subtract(value));
 
         payee.getWallet().setBalance(payee.getWallet().getBalance().add(value));
+
+        walletService.saveWalletAfterTransfer(payer.getWallet());
+
+        walletService.saveWalletAfterTransfer(payee.getWallet());
 
     }
 

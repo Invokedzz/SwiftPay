@@ -19,13 +19,16 @@ public class AuthorizationService {
 
     public boolean validateTransfer () {
 
-        return authorizationClient.validateTransference().data().authorization();
+        return authorizationClient
+                .validateTransference()
+                .data()
+                .authorization();
 
     }
 
-    public void validateTransferBody (TransferDTO transferDTO) {
+    public void validateTransferBodySandboxVer (TransferDTO transferDTO) {
 
-        transferAuthorizationPolicy.authorize(transferDTO);
+        transferAuthorizationPolicy.authorizeSandbox(transferDTO);
 
     }
 

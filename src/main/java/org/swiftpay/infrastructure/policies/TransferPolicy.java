@@ -1,9 +1,15 @@
 package org.swiftpay.infrastructure.policies;
 
+import org.swiftpay.dtos.BankTransferRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferRequestDTO;
 
 public interface TransferPolicy {
 
-    void validate (TransferDTO transferDTO);
+    void validateSandbox (TransferDTO transferDTO);
+
+    void validateAsaasTransfers (TransferRequestDTO transferRequestDTO);
+
+    void validateTransferToBankAccounts (BankTransferRequestDTO bankTransferRequestDTO);
 
 }

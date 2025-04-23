@@ -1,7 +1,9 @@
 package org.swiftpay.infrastructure.policies;
 
 import org.springframework.stereotype.Component;
+import org.swiftpay.dtos.BankTransferRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.exceptions.InvalidAmountException;
 
 import java.math.BigDecimal;
@@ -10,13 +12,23 @@ import java.math.BigDecimal;
 public class PositiveAmountPolicy implements TransferPolicy {
 
     @Override
-    public void validate (TransferDTO transferDTO) {
+    public void validateSandbox (TransferDTO transferDTO) {
 
         if (transferDTO.value().compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new InvalidAmountException("Invalid amount: " + transferDTO.value());
 
         }
+
+    }
+
+    @Override
+    public void validateAsaasTransfers (TransferRequestDTO transferRequestDTO) {
+
+    }
+
+    @Override
+    public void validateTransferToBankAccounts(BankTransferRequestDTO bankTransferRequestDTO) {
 
     }
 

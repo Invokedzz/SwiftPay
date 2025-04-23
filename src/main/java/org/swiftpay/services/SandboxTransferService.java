@@ -40,7 +40,7 @@ public class SandboxTransferService {
 
         authorizationService.checkIfPayerIsASeller(payer);
 
-        authorizationService.validateTransferBody(transferDTO);
+        authorizationService.validateTransferBodySandboxVer(transferDTO);
 
         authorizationService.compareValueAndBalance(payer.getWallet().getBalance(), transferDTO.value());
 

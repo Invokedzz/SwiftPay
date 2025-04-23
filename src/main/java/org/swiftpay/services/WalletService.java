@@ -28,6 +28,12 @@ public class WalletService {
 
     }
 
+    public void saveWalletAfterTransfer (Wallet wallet) {
+
+        walletRepository.save(wallet);
+
+    }
+
     public void saveSandboxWallet (Wallet wallet) {
 
         wallet.setBalance(BigDecimal.valueOf(100.0));

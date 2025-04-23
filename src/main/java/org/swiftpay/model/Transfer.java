@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferResponseDTO;
 import org.swiftpay.model.enums.TransferStatus;
+import org.swiftpay.model.enums.TransferType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,7 +27,8 @@ public class Transfer {
 
     private LocalDate transferDate;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private TransferType type;
 
     private String transferId;
 
@@ -39,6 +42,22 @@ public class Transfer {
     @ManyToOne
     @JoinColumn(name = "payee_id")
     private User payee;
+
+    public Transfer (TransferResponseDTO transferResponseDTO, User payer, User payee) {
+
+        this.value = transferResponseDTO.value();
+
+        this.transferDate = LocalDate.now();
+
+        this.type = transferResponseDTO.type();
+
+        this.transferId = transferResponseDTO.id();
+
+        this.payer = payer;
+
+        this.payee = payee;
+
+    }
 
     public Transfer (TransferDTO transferDTO, LocalDate transferDate, User payer, User payee) {
 

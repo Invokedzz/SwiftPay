@@ -16,7 +16,7 @@ import java.util.List;
 public record TransferController (TransferService transferService) {
 
     @PostMapping
-    public ResponseEntity <BankTransferResponseDTO> transferToBankAccounts (@Valid @RequestBody BankTransferRequestDTO transferRequestDTO) {
+    public ResponseEntity <TransferResponseDTO> transferToBankAccounts (@Valid @RequestBody BankTransferRequestDTO transferRequestDTO) {
 
         var response = transferService.transferToBankAccounts(transferRequestDTO);
 
@@ -52,11 +52,11 @@ public record TransferController (TransferService transferService) {
     }
 
     @DeleteMapping("/{id}/cancel")
-    public ResponseEntity <Void> cancelTransfer (@PathVariable String id) {
+    public ResponseEntity <TransferStatusDTO> cancelTransfer (@PathVariable String id) {
 
-        transferService.cancelTransfer(id);
+        var canceledTransfer = transferService.cancelTransfer(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(canceledTransfer);
 
     }
 

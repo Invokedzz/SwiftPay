@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.exceptions.InvalidAmountException;
 import org.swiftpay.exceptions.InvalidTypeOfPayerException;
 import org.swiftpay.model.User;
@@ -17,9 +18,15 @@ public class TransferAuthorizationPolicy {
 
     private final List <TransferPolicy> transferPolicies;
 
-    public void authorize (TransferDTO transferDTO) {
+    public void authorizeSandbox (TransferDTO transferDTO) {
 
-        transferPolicies.forEach(policy -> policy.validate(transferDTO));
+        transferPolicies.forEach(policy -> policy.validateSandbox(transferDTO));
+
+    }
+
+    public void authorizeTransfersToAsaasAccount (TransferRequestDTO transferRequestDTO) {
+
+        transferPolicies.forEach(policy -> policy.validateAsaasTransfers(transferRequestDTO));
 
     }
 

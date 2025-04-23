@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
+import org.swiftpay.exceptions.TransferNotFoundException;
 import org.swiftpay.infrastructure.clients.AsaasTransferClient;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
+import org.swiftpay.model.enums.TransferStatus;
 import org.swiftpay.repositories.TransferRepository;
 
 import java.math.BigDecimal;
@@ -60,9 +62,15 @@ public class TransferService {
 
     }
 
-    public List <TransferStatusDTO> getTransfers (LocalDate createdAt) {
+    public List <TransferStatusDTO> getTransfers (HttpHeaders headers, LocalDate transferDate) {
 
-        return null;
+        Long userId = tokenAuthService.findSessionId(headers);
+
+        return transferRepository
+                .findByPayer_Id(userId)
+                .stream()
+                .filter(transfer -> transfer.transferDate().equals(transferDate))
+                .map(TransferStatusDTO::new).toList();
 
     }
 
@@ -72,9 +80,31 @@ public class TransferService {
 
     }
 
+    public void confirmTransfer (String id) {
+
+        var transfer = transferRepository
+                        .findByTransferId(id)
+                        .orElseThrow(() -> new TransferNotFoundException("We weren't able to find a transfer with this id: " + id));
+
+        transfer.setStatus(TransferStatus.DONE);
+
+        transferRepository.save(transfer);
+
+    }
+
     public TransferStatusDTO cancelTransfer (String id) {
 
-        return asaasTransferClient.cancelTransfer(id);
+        var transfer = asaasTransferClient.cancelTransfer(id);
+
+        var findTransfer = transferRepository
+                            .findByTransferId(id)
+                            .orElseThrow(() -> new TransferNotFoundException("We weren't able to find a transfer with id: " + id));
+
+        findTransfer.setStatus(transfer.status());
+
+        transferRepository.save(findTransfer);
+
+        return transfer;
 
     }
 

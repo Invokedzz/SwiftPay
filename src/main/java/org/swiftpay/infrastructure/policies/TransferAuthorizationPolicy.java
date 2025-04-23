@@ -3,6 +3,7 @@ package org.swiftpay.infrastructure.policies;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.swiftpay.dtos.BankTransferRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.exceptions.InvalidAmountException;
@@ -27,6 +28,12 @@ public class TransferAuthorizationPolicy {
     public void authorizeTransfersToAsaasAccount (TransferRequestDTO transferRequestDTO) {
 
         transferPolicies.forEach(policy -> policy.validateAsaasTransfers(transferRequestDTO));
+
+    }
+
+    public void authorizeTransferToBankAccounts (BankTransferRequestDTO transferRequestDTO) {
+
+        transferPolicies.forEach(policy -> policy.validateTransferToBankAccounts(transferRequestDTO));
 
     }
 

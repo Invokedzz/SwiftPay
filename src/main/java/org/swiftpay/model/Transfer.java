@@ -51,6 +51,8 @@ public class Transfer {
 
         this.type = transferResponseDTO.type();
 
+        this.status = transferResponseDTO.status();
+
         this.transferId = transferResponseDTO.id();
 
         this.payer = payer;

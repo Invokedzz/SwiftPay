@@ -33,10 +33,19 @@ public record TransferController (TransferService transferService) {
 
     }
 
-    @GetMapping
-    public ResponseEntity <List<TransferStatusDTO>> getTransfers (@RequestParam LocalDate createdAt) {
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity <Void> confirmTransfer (@PathVariable String id) {
 
-        var transfers = transferService.getTransfers(createdAt);
+        transferService.confirmTransfer(id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
+    @GetMapping
+    public ResponseEntity <List<TransferStatusDTO>> getTransfers (@RequestHeader HttpHeaders headers, @RequestHeader LocalDate createdAt) {
+
+        var transfers = transferService.getTransfers(headers, createdAt);
 
         return ResponseEntity.status(HttpStatus.OK).body(transfers);
 

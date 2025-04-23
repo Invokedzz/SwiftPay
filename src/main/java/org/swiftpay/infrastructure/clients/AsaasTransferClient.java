@@ -11,19 +11,19 @@ import org.swiftpay.dtos.TransferStatusDTO;
 import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(url = "${asaas.url}/transfers", name= "AsaasTransferClient", configuration = AsaasConfig.class)
+@FeignClient(url = "${asaas.url}", name= "AsaasTransferClient", configuration = AsaasConfig.class)
 public interface AsaasTransferClient {
 
     @PostMapping
     BankTransferResponseDTO transferToBankAccounts (@RequestBody TransferRequestDTO transferRequestDTO);
 
-    @PostMapping("/")
+    @PostMapping("/transfers/")
     TransferResponseDTO transferToAsaasAccount (@RequestBody TransferRequestDTO transferRequestDTO);
 
     @GetMapping
     List <TransferStatusDTO> getTransfers (@RequestParam LocalDate createdAt);
 
-    @GetMapping("/{id}")
+    @GetMapping("/transfers/{id}")
     TransferStatusDTO getIndividualTransfer (@PathVariable String id);
 
     @DeleteMapping("/{id}/cancel")

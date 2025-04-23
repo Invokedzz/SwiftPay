@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.model.enums.TransferStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,6 +24,13 @@ public class Transfer {
     private BigDecimal value;
 
     private LocalDate transferDate;
+
+    private String type;
+
+    private String transferId;
+
+    @Enumerated(EnumType.STRING)
+    private TransferStatus status;
 
     @ManyToOne
     @JoinColumn(name = "payer_id")

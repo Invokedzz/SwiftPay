@@ -2,11 +2,14 @@ package org.swiftpay.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.infrastructure.clients.AsaasTransferClient;
+import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,7 +23,7 @@ public class TransferService {
 
     private final UserServices userServices;
 
-    private final AuthService authService;
+    private final TokenAuthService tokenAuthService;
 
     private final AuthorizationService authorizationService;
 
@@ -32,11 +35,21 @@ public class TransferService {
     }
 
     @Transactional
-    public TransferResponseDTO transferToAsaasAccount (TransferRequestDTO transferRequestDTO) {
+    public TransferResponseDTO transferToAsaasAccount (HttpHeaders headers, TransferRequestDTO transferRequestDTO) {
 
+        Long payerId = tokenAuthService.findSessionId(headers);
 
+        var payer = userServices.findUserById(payerId);
 
-        return null;
+        var payee = userServices.findUserByWalletId(transferRequestDTO.walletId());
+
+        authorizationService.checkIfPayerIsASeller(payer);
+
+        authorizationService.compareValueAndBalance(payer.getWallet().getBalance(), transferRequestDTO.value());
+
+        transference(payer, payee, transferRequestDTO.value());
+
+        return asaasTransferClient.transferToAsaasAccount(transferRequestDTO);
 
     }
 
@@ -48,13 +61,21 @@ public class TransferService {
 
     public TransferStatusDTO getIndividualTransfer (String id) {
 
-        return null;
+        return asaasTransferClient.getIndividualTransfer(id);
 
     }
 
     public void cancelTransfer (String id) {
 
 
+
+    }
+
+    private void transference (User payer, User payee, BigDecimal value) {
+
+        payer.getWallet().setBalance(payer.getWallet().getBalance().subtract(value));
+
+        payee.getWallet().setBalance(payee.getWallet().getBalance().add(value));
 
     }
 

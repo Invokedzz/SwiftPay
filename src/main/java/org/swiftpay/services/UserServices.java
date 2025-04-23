@@ -125,14 +125,6 @@ public class UserServices {
 
     }
 
-    public User findUserById (Long id) {
-
-        return userRepository
-                .findById(id)
-                .orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
-
-    }
-
     public User getProfileById (HttpHeaders headers, Long id) {
 
         var searchForAccount = userRepository
@@ -163,15 +155,19 @@ public class UserServices {
 
     }
 
-    private void checkIfEmailAlreadyExists (String email) {
+    public User findUserByWalletId (String walletId) {
 
-        var searchForEmail = userRepository.findByEmail(email);
+        return userRepository
+                .findByWalletAsaasWalletIdEqualsIgnoreCase(walletId)
+                .orElseThrow(() -> new UserNotFoundException("We weren't able to find a user with this id: " + walletId));
 
-        if (searchForEmail.isPresent()) {
+    }
 
-            throw new InvalidEmailFormatException("Email already exists!");
+    public User findUserById (Long id) {
 
-        }
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new UserNotFoundException("We were not able to find a user with this id: " + id));
 
     }
 
@@ -182,6 +178,18 @@ public class UserServices {
         checkIfCPFCNPJAlreadyExists(user.getCpfCnpj());
 
         checkIfUsernameAlreadyExists(user.getUsername());
+
+    }
+
+    private void checkIfEmailAlreadyExists (String email) {
+
+        var searchForEmail = userRepository.findByEmail(email);
+
+        if (searchForEmail.isPresent()) {
+
+            throw new InvalidEmailFormatException("Email already exists!");
+
+        }
 
     }
 

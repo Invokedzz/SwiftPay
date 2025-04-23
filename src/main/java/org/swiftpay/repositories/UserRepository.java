@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository <User, Long> {
 
     Optional <User> findByUsernameEqualsIgnoreCase (String username);
 
+    Optional <User> findByWalletAsaasWalletIdEqualsIgnoreCase (String walletId);
+
 }

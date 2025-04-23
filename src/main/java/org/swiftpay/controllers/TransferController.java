@@ -1,6 +1,7 @@
 package org.swiftpay.controllers;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,9 @@ public record TransferController (TransferService transferService) {
     }
 
     @PostMapping("/")
-    public ResponseEntity <TransferResponseDTO> transferToAsaasAccount (@Valid @RequestBody TransferRequestDTO transferRequestDTO) {
+    public ResponseEntity <TransferResponseDTO> transferToAsaasAccount (@RequestHeader HttpHeaders headers, @Valid @RequestBody TransferRequestDTO transferRequestDTO) {
 
-        var response = transferService.transferToAsaasAccount(transferRequestDTO);
+        var response = transferService.transferToAsaasAccount(headers, transferRequestDTO);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
 

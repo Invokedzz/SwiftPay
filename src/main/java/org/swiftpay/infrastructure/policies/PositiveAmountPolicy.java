@@ -33,15 +33,4 @@ public class PositiveAmountPolicy implements TransferPolicy {
 
     }
 
-    @Override
-    public void validateTransferToBankAccounts(BankTransferRequestDTO bankTransferRequestDTO) {
-
-        if (bankTransferRequestDTO.value().compareTo(BigDecimal.ZERO) <= 0) {
-
-            throw new InvalidAmountException("Invalid amount: " + bankTransferRequestDTO.value());
-
-        }
-
-    }
-
 }

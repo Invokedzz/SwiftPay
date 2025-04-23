@@ -33,9 +33,4 @@ public class NotSelfTransferPolicy implements TransferPolicy {
 
     }
 
-    @Override
-    public void validateTransferToBankAccounts(BankTransferRequestDTO bankTransferRequestDTO) {
-
-    }
-
 }

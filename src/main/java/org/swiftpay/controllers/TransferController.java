@@ -15,15 +15,6 @@ import java.util.List;
 @RequestMapping("/transfer")
 public record TransferController (TransferService transferService) {
 
-    @PostMapping
-    public ResponseEntity <TransferResponseDTO> transferToBankAccounts (@Valid @RequestBody BankTransferRequestDTO transferRequestDTO) {
-
-        var response = transferService.transferToBankAccounts(transferRequestDTO);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-
-    }
-
     @PostMapping("/")
     public ResponseEntity <TransferResponseDTO> transferToAsaasAccount (@RequestHeader HttpHeaders headers, @Valid @RequestBody TransferRequestDTO transferRequestDTO) {
 

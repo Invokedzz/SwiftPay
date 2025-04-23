@@ -10,6 +10,4 @@ public interface TransferPolicy {
 
     void validateAsaasTransfers (TransferRequestDTO transferRequestDTO);
 
-    void validateTransferToBankAccounts (BankTransferRequestDTO bankTransferRequestDTO);
-
 }

@@ -31,12 +31,6 @@ public class TransferAuthorizationPolicy {
 
     }
 
-    public void authorizeTransferToBankAccounts (BankTransferRequestDTO transferRequestDTO) {
-
-        transferPolicies.forEach(policy -> policy.validateTransferToBankAccounts(transferRequestDTO));
-
-    }
-
     public void validateValueThatIsGoingToBeTransferred (BigDecimal balance, BigDecimal value) {
 
         if (value.compareTo(balance) > 0) {

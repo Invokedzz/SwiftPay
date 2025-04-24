@@ -1,4 +1,5 @@
 package org.swiftpay.dtos;
 
-public record PIXKeyRequestDTO () {
-}
+import org.swiftpay.model.enums.PIXType;
+
+public record PIXKeyRequestDTO (PIXType type) {}

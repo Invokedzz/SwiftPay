@@ -1,6 +1,5 @@
 package org.swiftpay.infrastructure.policies;
 
-import org.swiftpay.dtos.BankTransferRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.dtos.TransferRequestDTO;
 

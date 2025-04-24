@@ -1,3 +1,9 @@
 package org.swiftpay.dtos;
 
-public record PayeeDTO (String name, String cpfCnpj) {}
+public record PayeeDTO (
+
+        String name,
+
+        String cpfCnpj
+
+) {}

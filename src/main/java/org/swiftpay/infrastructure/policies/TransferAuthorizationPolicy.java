@@ -3,7 +3,6 @@ package org.swiftpay.infrastructure.policies;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.swiftpay.dtos.BankTransferRequestDTO;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.exceptions.InvalidAmountException;

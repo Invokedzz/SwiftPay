@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.model.enums.PIXStatus;
 import org.swiftpay.model.enums.PIXType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -23,16 +25,36 @@ public class PIX {
 
     private String key;
 
+    @Enumerated(EnumType.STRING)
     private PIXType type;
 
+    @Enumerated(EnumType.STRING)
     private PIXStatus status;
 
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
 
     private Boolean canBeDeleted;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public PIX (PIXKeyResponseDTO pixKeyResponseDTO, User user) {
+
+        this.asaasPixId = pixKeyResponseDTO.id();
+
+        this.key = pixKeyResponseDTO.key();
+
+      //  this.type = pixKeyResponseDTO.type();
+
+        //this.status = pixKeyResponseDTO.status();
+
+        this.dateCreated = pixKeyResponseDTO.dateCreated();
+
+        this.canBeDeleted = true;
+
+        this.user = user;
+
+    }
 
 }

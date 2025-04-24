@@ -100,6 +100,7 @@ public class ErrorsHandler {
             InvalidEmailFormatException.class,
             CPFCNPJAlreadyExistsException.class,
             UsernameAlreadyExistsException.class,
+            KeyGenerationException.class,
 
     })
     public ResponseEntity <ErrorDTO> handleBadRequest (Exception ex) {

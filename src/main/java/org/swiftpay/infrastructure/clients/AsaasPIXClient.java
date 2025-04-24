@@ -1,5 +1,6 @@
 package org.swiftpay.infrastructure.clients;
 
+import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.configuration.AsaasConfig;
@@ -9,6 +10,7 @@ import org.swiftpay.dtos.PIXKeyResponseDTO;
 
 import java.util.List;
 
+@Headers("Content-Type: application/json")
 @FeignClient(url = "https://api-sandbox.asaas.com/v3/pix", name = "AsaasPIXClient", configuration = AsaasConfig.class)
 public interface AsaasPIXClient {
 

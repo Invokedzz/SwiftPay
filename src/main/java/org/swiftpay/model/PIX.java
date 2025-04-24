@@ -8,7 +8,6 @@ import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.model.enums.PIXStatus;
 import org.swiftpay.model.enums.PIXType;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,7 +30,7 @@ public class PIX {
     @Enumerated(EnumType.STRING)
     private PIXStatus status;
 
-    private LocalDateTime dateCreated;
+    private LocalDateTime createdAt;
 
     private Boolean canBeDeleted;
 
@@ -45,13 +44,13 @@ public class PIX {
 
         this.key = pixKeyResponseDTO.key();
 
-      //  this.type = pixKeyResponseDTO.type();
+        this.type = pixKeyResponseDTO.type();
 
-        //this.status = pixKeyResponseDTO.status();
+        this.status = pixKeyResponseDTO.status();
 
-        this.dateCreated = pixKeyResponseDTO.dateCreated();
+        this.createdAt = LocalDateTime.now();
 
-        this.canBeDeleted = true;
+        this.canBeDeleted = pixKeyResponseDTO.canBeDeleted();
 
         this.user = user;
 

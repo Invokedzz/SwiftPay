@@ -36,19 +36,19 @@ public class PIXService {
 
         var response = asaasPIXClient.generatePIXKey(pixKeyRequestDTO);
 
-       // if (!PIXStatus.ERROR.equals(response.status())) {
+        if (!PIXStatus.ERROR.equals(response.status())) {
 
             Long userId = tokenAuthService.findSessionId(headers);
 
             var user = userServices.findUserById(userId);
 
-        //    pixRepository.save(new PIX(response, user));
+            pixRepository.save(new PIX(response, user));
 
             return response;
 
-      //  }
+        }
 
-      //  throw new KeyGenerationException("PIX Key generation failed. Please try again later.");
+        throw new KeyGenerationException("PIX Key generation failed. Please try again later.");
 
     }
 

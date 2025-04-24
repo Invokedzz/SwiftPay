@@ -1,7 +1,5 @@
 package org.swiftpay.dtos;
 
-import org.springframework.cglib.core.Local;
-import org.swiftpay.model.Transfer;
 import org.swiftpay.model.enums.TransferStatus;
 import org.swiftpay.model.enums.TransferType;
 

@@ -25,9 +25,9 @@ public record PixController (PIXService pixService) {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity <PIXKeyDTO> getIndividualKey (@PathVariable String id) {
+    public ResponseEntity <PIXKeyDTO> getIndividualKey (@RequestHeader HttpHeaders headers, @PathVariable String id) {
 
-        var key = pixService.getIndividualKey(id);
+        var key = pixService.getIndividualKey(headers, id);
 
         return ResponseEntity.status(HttpStatus.OK).body(key);
 

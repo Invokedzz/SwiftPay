@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.TransferNotFoundException;
-import org.swiftpay.infrastructure.clients.AsaasPIXTransferClient;
 import org.swiftpay.infrastructure.clients.AsaasTransferClient;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
@@ -22,8 +21,6 @@ import java.util.List;
 public class TransferService {
 
     private final AsaasTransferClient asaasTransferClient;
-
-    private final AsaasPIXTransferClient asaasPIXTransferClient;
 
     private final TransferRepository transferRepository;
 

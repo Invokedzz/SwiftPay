@@ -67,6 +67,21 @@ public class ErrorsHandler {
 
     }
 
+    @ExceptionHandler(KeyNotFoundException.class)
+    public ResponseEntity <ErrorDTO> handleKeyNotFoundException (KeyNotFoundException ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity <ErrorDTO> handleMethodArgumentNotValidException (MethodArgumentNotValidException ex) {
 

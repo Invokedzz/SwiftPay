@@ -3,13 +3,12 @@ package org.swiftpay.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.swiftpay.dtos.PIXKeyDTO;
 import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.exceptions.KeyGenerationException;
+import org.swiftpay.exceptions.KeyNotFoundException;
 import org.swiftpay.infrastructure.clients.AsaasPIXClient;
 import org.swiftpay.model.PIX;
 import org.swiftpay.model.enums.PIXStatus;
@@ -27,6 +26,8 @@ public class PIXService {
 
     private final AsaasPIXClient asaasPIXClient;
 
+    private final AsaasService asaasService;
+
     private final TokenAuthService tokenAuthService;
 
     private final UserServices userServices;
@@ -34,7 +35,7 @@ public class PIXService {
     @Transactional
     public PIXKeyResponseDTO generatePIXKey (HttpHeaders headers, PIXKeyRequestDTO pixKeyRequestDTO) {
 
-        var response = asaasPIXClient.generatePIXKey(pixKeyRequestDTO);
+        var response = asaasService.askAsaasToGeneratePIXKey(pixKeyRequestDTO);
 
         if (!PIXStatus.ERROR.equals(response.status())) {
 
@@ -52,9 +53,25 @@ public class PIXService {
 
     }
 
-    public PIXKeyDTO getIndividualKey (String id) {
+    public PIXKeyDTO getIndividualKey (HttpHeaders headers, String id) {
 
-        return asaasPIXClient.getIndividualKey(id);
+        var pix = asaasService.fetchKeyFromAsaas(id);
+
+        Long userId = tokenAuthService.findSessionId(headers);
+
+        var pixKeys = pixRepository.findByUser_Id(userId);
+
+        for (var pixKey : pixKeys) {
+
+            if (pixKey.getAsaasPixId().equals(id)) {
+
+                return pix;
+
+            }
+
+        }
+
+        throw new KeyNotFoundException("We weren't able to find a PIX with this key!");
 
     }
 

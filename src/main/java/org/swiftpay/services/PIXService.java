@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.PIXKeyDTO;
+import org.swiftpay.dtos.PIXKeyData;
 import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.exceptions.KeyGenerationException;
@@ -14,17 +15,11 @@ import org.swiftpay.model.PIX;
 import org.swiftpay.model.enums.PIXStatus;
 import org.swiftpay.repositories.PIXRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class PIXService {
 
     private final PIXRepository pixRepository;
-
-    private final AsaasPIXClient asaasPIXClient;
 
     private final AsaasService asaasService;
 
@@ -75,12 +70,30 @@ public class PIXService {
 
     }
 
-    public List <PIXKeyDTO> getKeys () {
+    public PIXKeyData getKeys () {
 
-        return asaasPIXClient.getKeys().stream().map(PIXKeyDTO::new).collect(Collectors.toList());
+        return asaasService.fetchUserKeysFromAsaas();
 
     }
 
-    public void deletePIXKey (String id) {}
+    public void deletePIXKey (HttpHeaders headers, String id) {
+
+        Long userId = tokenAuthService.findSessionId(headers);
+
+        var userKeys = pixRepository.findByUser_Id(userId);
+
+        for (var pixKey : userKeys) {
+
+            if (pixKey.getAsaasPixId().equals(id)) {
+
+                asaasService.deletePIXKeyFromAccount(id);
+
+            }
+
+        }
+
+        throw new KeyNotFoundException("We weren't able to find a PIX with this key!");
+
+    }
 
 }

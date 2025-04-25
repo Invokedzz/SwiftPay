@@ -13,4 +13,6 @@ public interface PIXRepository extends JpaRepository <PIX, Long> {
     PIXKeyDTO findByAsaasPixIdAndUser(String asaasPixId, User user);
 
     List<PIX> findByUser_Id(Long userId);
+
+    List<PIX> findByAsaasPixId(String asaasPixId);
 }

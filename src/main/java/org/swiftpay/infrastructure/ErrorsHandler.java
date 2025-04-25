@@ -168,18 +168,33 @@ public class ErrorsHandler {
 
     }
 
-    @ExceptionHandler(APIErrorException.class)
-    public ResponseEntity <ErrorDTO> handleServiceUnavailable (APIErrorException ex) {
+    @ExceptionHandler(AsaasUnauthorizedException.class)
+    public ResponseEntity <ErrorDTO> handleExternalAPIUnauthorizedException (AsaasUnauthorizedException ex) {
 
         ErrorDTO response = new ErrorDTO(
 
-                HttpStatus.GATEWAY_TIMEOUT.value(),
+                HttpStatus.UNAUTHORIZED.value(),
                 ex.getMessage(),
                 LocalDateTime.now()
 
         );
 
-        return new ResponseEntity<>(response, HttpStatus.GATEWAY_TIMEOUT);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+
+    }
+
+    @ExceptionHandler(AsaasForbiddenException.class)
+    public ResponseEntity <ErrorDTO> handleExternalAPIForbiddenException (AsaasForbiddenException ex) {
+
+        ErrorDTO response = new ErrorDTO(
+
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
 
     }
 

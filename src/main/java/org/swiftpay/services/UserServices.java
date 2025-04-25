@@ -31,13 +31,15 @@ public class UserServices {
 
     private final DeleteRegisterService deleteRegisterService;
 
+    private final AsaasService asaasService;
+
     private final RolesService rolesService;
 
     private final AuthService authService;
 
     private final MailService mailService;
 
-    private final CustomerService asaasService;
+    private final CustomerService customerService;
 
     private final WalletService walletService;
 
@@ -52,7 +54,7 @@ public class UserServices {
 
         CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(registerDTO);
 
-        asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedClient));
+        customerService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedClient));
 
         rolesService.setupUserRolesAndSave(validatedClient);
 
@@ -67,11 +69,13 @@ public class UserServices {
 
         var validatedSeller = rolesService.validateSellerPropertiesBeforeRegister(registerDTO);
 
+        checkIfAnyOfTheseInformationAlreadyExist(validatedSeller);
+
         userRepository.save(validatedSeller);
 
         CustomerResponseDTO customerResponseDTO = asaasService.registerCustomerInAsaas(registerDTO);
 
-        asaasService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedSeller));
+        customerService.saveCustomerInTheDB(new SaveAsaasCustomerDTO(customerResponseDTO.id(), validatedSeller));
 
         rolesService.setupUserRolesAndSave(validatedSeller);
 

@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.configuration.AsaasConfig;
 import org.swiftpay.dtos.PIXKeyDTO;
+import org.swiftpay.dtos.PIXKeyData;
 import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 
@@ -18,7 +19,7 @@ public interface AsaasPIXClient {
     PIXKeyResponseDTO generatePIXKey (@RequestBody PIXKeyRequestDTO PIXKeyRequestDTO);
 
     @GetMapping("/addressKeys")
-    List <PIXKeyDTO> getKeys ();
+    PIXKeyData getKeys ();
 
     @GetMapping("/addressKeys/{id}")
     PIXKeyDTO getIndividualKey (@PathVariable String id);

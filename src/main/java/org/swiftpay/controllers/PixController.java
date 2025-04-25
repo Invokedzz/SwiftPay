@@ -5,11 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.swiftpay.dtos.PIXKeyDTO;
+import org.swiftpay.dtos.PIXKeyData;
 import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.services.PIXService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/keys")
@@ -34,7 +33,7 @@ public record PixController (PIXService pixService) {
     }
 
     @GetMapping
-    public ResponseEntity <List<PIXKeyDTO>> getKeys () {
+    public ResponseEntity <PIXKeyData> getKeys () {
 
         var keys = pixService.getKeys();
 
@@ -43,7 +42,9 @@ public record PixController (PIXService pixService) {
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity <Void> deletePIXKey (@PathVariable String id) {
+    public ResponseEntity <Void> deletePIXKey (@RequestHeader HttpHeaders headers, @PathVariable String id) {
+
+        pixService.deletePIXKey(headers, id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 

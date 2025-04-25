@@ -11,15 +11,7 @@ import org.swiftpay.repositories.AsaasRepository;
 @RequiredArgsConstructor
 public class CustomerService {
 
-    private final AsaasAccountsClient customerClient;
-
     private final AsaasRepository asaasRepository;
-
-    public CustomerResponseDTO registerCustomerInAsaas (RegisterDTO registerDTO) {
-
-        return customerClient.createCustomer(registerDTO);
-
-    }
 
     public void saveCustomerInTheDB (SaveAsaasCustomerDTO saveAsaasCustomerDTO) {
 

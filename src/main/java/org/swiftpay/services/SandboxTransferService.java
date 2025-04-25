@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
-import org.swiftpay.exceptions.APIErrorException;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.repositories.TransferRepository;
@@ -46,8 +45,6 @@ public class SandboxTransferService {
 
         transference(payer, payee, transferDTO.value());
 
-        validateTransference();
-
         saveTransference(transferDTO, payer, payee);
 
         sendNotificationAfterTransfer();
@@ -75,16 +72,6 @@ public class SandboxTransferService {
     private void sendNotificationAfterTransfer () {
 
         notificationService.sendNotification();
-
-    }
-
-    private void validateTransference () {
-
-        if (!authorizationService.validateTransfer()) {
-
-            throw new APIErrorException("The API is not accepting transfers right now. Please, try again sometime.");
-
-        }
 
     }
 

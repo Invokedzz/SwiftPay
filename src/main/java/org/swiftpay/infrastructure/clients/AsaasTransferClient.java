@@ -13,9 +13,6 @@ import java.util.List;
 @FeignClient(url = "${asaas.url}/transfers", name= "AsaasTransferClient", configuration = AsaasConfig.class)
 public interface AsaasTransferClient {
 
-    @PostMapping
-    TransferResponseDTO transferToBankAccounts (@RequestBody TransferRequestDTO transferRequestDTO);
-
     @PostMapping("/")
     TransferResponseDTO transferToAsaasAccount (@RequestBody TransferRequestDTO transferRequestDTO);
 

@@ -5,13 +5,10 @@ import org.springframework.stereotype.Component;
 import org.swiftpay.dtos.TransferDTO;
 import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.exceptions.SelfTransferException;
-import org.swiftpay.services.UserServices;
 
 @Component
 @RequiredArgsConstructor
 public class NotSelfTransferPolicy implements TransferPolicy {
-
-    private final UserServices userServices;
 
     @Override
     public void validateSandbox (TransferDTO transferDTO) {
@@ -27,7 +24,11 @@ public class NotSelfTransferPolicy implements TransferPolicy {
     @Override
     public void validateAsaasTransfers (TransferRequestDTO transferRequestDTO) {
 
+        if (transferRequestDTO.walletId().equals(transferRequestDTO.externalReference())) {
 
+            throw new SelfTransferException("You are not allowed to transfer to yourself!");
+
+        }
 
     }
 

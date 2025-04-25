@@ -9,8 +9,6 @@ import org.swiftpay.dtos.PIXKeyData;
 import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 
-import java.util.List;
-
 @Headers("Content-Type: application/json")
 @FeignClient(url = "https://api-sandbox.asaas.com/v3/pix", name = "AsaasPIXClient", configuration = AsaasConfig.class)
 public interface AsaasPIXClient {

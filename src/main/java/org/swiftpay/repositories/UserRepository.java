@@ -5,8 +5,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 import org.swiftpay.model.User;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Repository

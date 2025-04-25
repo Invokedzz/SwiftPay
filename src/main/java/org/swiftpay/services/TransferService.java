@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.*;
 import org.swiftpay.exceptions.TransferNotFoundException;
-import org.swiftpay.infrastructure.clients.AsaasTransferClient;
 import org.swiftpay.model.Transfer;
 import org.swiftpay.model.User;
 import org.swiftpay.model.enums.TransferStatus;
@@ -20,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransferService {
 
-    private final AsaasTransferClient asaasTransferClient;
+    private final AsaasService asaasService;
 
     private final TransferRepository transferRepository;
 
@@ -43,11 +42,13 @@ public class TransferService {
 
         authorizationService.checkIfPayerIsASeller(payer);
 
+        authorizationService.validateTransferBody(transferRequestDTO);
+
         authorizationService.compareValueAndBalance(payer.getWallet().getBalance(), transferRequestDTO.value());
 
         transference(payer, payee, transferRequestDTO.value());
 
-        var transferResponseDTO = asaasTransferClient.transferToAsaasAccount(transferRequestDTO);
+        var transferResponseDTO = asaasService.askAsaasToTransferToACertainAccount(transferRequestDTO);
 
         transferRepository.save(new Transfer(transferResponseDTO, payer, payee));
 
@@ -69,7 +70,7 @@ public class TransferService {
 
     public TransferStatusDTO getIndividualTransfer (String id) {
 
-        return asaasTransferClient.getIndividualTransfer(id);
+        return asaasService.getIndividualTransfer(id);
 
     }
 
@@ -87,13 +88,15 @@ public class TransferService {
 
     public TransferStatusDTO cancelTransfer (String id) {
 
-        var transfer = asaasTransferClient.cancelTransfer(id);
+        var transfer = asaasService.getIndividualTransfer(id);
 
         var findTransfer = transferRepository
                             .findByTransferId(id)
                             .orElseThrow(() -> new TransferNotFoundException("We weren't able to find a transfer with id: " + id));
 
         findTransfer.setStatus(transfer.status());
+
+        asaasService.cancelTransfer(id);
 
         transferRepository.save(findTransfer);
 

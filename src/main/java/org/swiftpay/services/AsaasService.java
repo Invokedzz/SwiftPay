@@ -8,10 +8,6 @@ import org.swiftpay.exceptions.*;
 import org.swiftpay.infrastructure.clients.AsaasAccountsClient;
 import org.swiftpay.infrastructure.clients.AsaasPIXClient;
 import org.swiftpay.infrastructure.clients.AsaasTransferClient;
-import org.swiftpay.repositories.AsaasRepository;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,28 +37,6 @@ public class AsaasService {
 
     }
 
-    public CustomerResponseDTO getCustomerRegisteredInAsaas (String id) {
-
-        try {
-
-            return asaasAccountsClient.getCustomer(id);
-
-        } catch (FeignException.NotFound ex) {
-
-            throw new UsernameNotFoundException(ex.getMessage());
-
-        } catch (FeignException.Unauthorized ex) {
-
-            throw new AsaasUnauthorizedException(ex.getMessage());
-
-        } catch (FeignException.Forbidden ex) {
-
-            throw new AsaasForbiddenException(ex.getMessage());
-
-        }
-
-    }
-
     public TransferResponseDTO askAsaasToTransferToACertainAccount (TransferRequestDTO transferRequestDTO) {
 
         try {
@@ -76,28 +50,6 @@ public class AsaasService {
         } catch (FeignException.Unauthorized ex) {
 
             throw new AsaasUnauthorizedException(ex.getMessage());
-
-        }
-
-    }
-
-    public List<TransferStatusDTO> getTransfersMadeByUser (LocalDate createdAt) {
-
-        try {
-
-            return asaasTransferClient.getTransfers(createdAt);
-
-        } catch (FeignException.NotFound ex) {
-
-            throw new TransferNotFoundException(ex.getMessage());
-
-        } catch (FeignException.Unauthorized ex) {
-
-            throw new AsaasUnauthorizedException(ex.getMessage());
-
-        } catch (FeignException.Forbidden ex) {
-
-            throw new AsaasForbiddenException(ex.getMessage());
 
         }
 

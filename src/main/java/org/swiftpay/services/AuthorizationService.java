@@ -3,6 +3,7 @@ package org.swiftpay.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.swiftpay.dtos.TransferDTO;
+import org.swiftpay.dtos.TransferRequestDTO;
 import org.swiftpay.infrastructure.clients.AuthorizationClient;
 import org.swiftpay.infrastructure.policies.TransferAuthorizationPolicy;
 import org.swiftpay.model.User;
@@ -23,6 +24,12 @@ public class AuthorizationService {
                 .validateTransference()
                 .data()
                 .authorization();
+
+    }
+
+    public void validateTransferBody (TransferRequestDTO transferRequestDTO) {
+
+        transferAuthorizationPolicy.authorizeTransfersToAsaasAccount(transferRequestDTO);
 
     }
 

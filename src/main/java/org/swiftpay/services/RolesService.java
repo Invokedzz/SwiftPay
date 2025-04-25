@@ -9,10 +9,7 @@ import org.swiftpay.dtos.RegisterDTO;
 import org.swiftpay.exceptions.InvalidCNPJException;
 import org.swiftpay.exceptions.InvalidCPFException;
 import org.swiftpay.model.User;
-import org.swiftpay.model.Wallet;
 import org.swiftpay.repositories.RoleRepository;
-
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor

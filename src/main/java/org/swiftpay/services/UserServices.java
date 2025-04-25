@@ -87,7 +87,15 @@ public class UserServices {
 
     public String login (LoginDTO loginDTO) {
 
-        return authService.validateLoginPropertiesThenGenerateToken(loginDTO);
+        var user = userRepository.findByUsername(loginDTO.username());
+
+        if (user != null) {
+
+            return authService.validateLoginPropertiesThenGenerateToken(loginDTO);
+
+        }
+
+        throw new UserNotFoundException("Username or password is incorrect!");
 
     }
 

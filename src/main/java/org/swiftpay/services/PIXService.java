@@ -10,7 +10,6 @@ import org.swiftpay.dtos.PIXKeyRequestDTO;
 import org.swiftpay.dtos.PIXKeyResponseDTO;
 import org.swiftpay.exceptions.KeyGenerationException;
 import org.swiftpay.exceptions.KeyNotFoundException;
-import org.swiftpay.infrastructure.clients.AsaasPIXClient;
 import org.swiftpay.model.PIX;
 import org.swiftpay.model.enums.PIXStatus;
 import org.swiftpay.repositories.PIXRepository;

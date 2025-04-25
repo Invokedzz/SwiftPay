@@ -43,11 +43,15 @@ public class SandboxTransferService {
 
         authorizationService.compareValueAndBalance(payer.getWallet().getBalance(), transferDTO.value());
 
-        transference(payer, payee, transferDTO.value());
+        if (authorizationService.validateTransfer()) {
 
-        saveTransference(transferDTO, payer, payee);
+            transference(payer, payee, transferDTO.value());
 
-        sendNotificationAfterTransfer();
+            saveTransference(transferDTO, payer, payee);
+
+            sendNotificationAfterTransfer();
+
+        }
 
     }
 

@@ -54,34 +54,6 @@ First and foremost, this pattern aligns with the SOLID principles, making it bot
 
 The main purpose of the Repository Pattern is to abstract the data layer, acting as a mediator between the domain and the data source. This allows us to manage domain objects without needing to know the underlying database implementation, which results in more testable, modular, and flexible code.
 
-## How to run the project
-
-First of all, build your container with this command
-
-```bash
-
-docker build -t swiftpay .
-
-docker run swiftpay
-
-```
-
-Then, navigate to the root of the project via command line and execute the command
-
-```bash
-
-mvn spring-boot:run
-
-```
-
-## How to access the Swagger Documentation
-
-```bash
-
-http://localhost:8080/swagger-ui/index.html#/
-
-```
-
 ## License
 
 The MIT License (MIT)
